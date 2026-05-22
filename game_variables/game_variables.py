@@ -15,9 +15,9 @@ class GameVariables:
     @staticmethod
     def init():
         pygame.init()
-        GameVariables.FONT_BIG = pygame.font.SysFont("bahnschrift", 48, bold=True)
-        GameVariables.FONT_MIDDLE = pygame.font.SysFont("bahnschrift", 30, bold=False)
-        GameVariables.FONT_SMALL = pygame.font.SysFont("bahnschrift", 14, bold=False)
+        GameVariables.FONT_BIG = pygame.font.SysFont("orbitron", 48, bold=True)
+        GameVariables.FONT_MIDDLE = pygame.font.SysFont("orbitron", 30, bold=False)
+        GameVariables.FONT_SMALL = pygame.font.SysFont("orbitron", 14, bold=False)
 
 
 class GameScreens:
