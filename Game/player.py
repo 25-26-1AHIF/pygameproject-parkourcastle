@@ -1,5 +1,6 @@
 import pygame
 from game_variables.game_variables import GameVariables
+from Game.platform import Platform
 
 class Player:
     def __init__(self, screen):
