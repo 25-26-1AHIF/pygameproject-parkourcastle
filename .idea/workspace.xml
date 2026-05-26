@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ad0fc84f-e4dd-45ea-b1f9-0ac010cc5c26" name="Changes" comment="Player funktioniert. Kann jetzt laufen und springen inklusive Animationen">
+    <list default="true" id="ad0fc84f-e4dd-45ea-b1f9-0ac010cc5c26" name="Changes" comment="Cooldown für Dash. Noch NICHT fertig!">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Game/player.py" beforeDir="false" afterPath="$PROJECT_DIR$/Game/player.py" afterDir="false" />
     </list>
@@ -151,7 +151,15 @@
       <option name="project" value="LOCAL" />
       <updated>1779793501588</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="Cooldown für Dash. Noch NICHT fertig!">
+      <option name="closed" value="true" />
+      <created>1779794586940</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1779794586940</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -184,6 +192,7 @@
     <MESSAGE value="gitignore für fehlerbehebung" />
     <MESSAGE value="bilder mir geben" />
     <MESSAGE value="Player funktioniert. Kann jetzt laufen und springen inklusive Animationen" />
-    <option name="LAST_COMMIT_MESSAGE" value="Player funktioniert. Kann jetzt laufen und springen inklusive Animationen" />
+    <MESSAGE value="Cooldown für Dash. Noch NICHT fertig!" />
+    <option name="LAST_COMMIT_MESSAGE" value="Cooldown für Dash. Noch NICHT fertig!" />
   </component>
 </project>
