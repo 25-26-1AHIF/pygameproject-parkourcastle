@@ -1,6 +1,5 @@
 import pygame
 from game_variables.game_variables import GameVariables
-from Game.platform import Platform
 
 class Player:
     def __init__(self, screen):
@@ -9,7 +8,8 @@ class Player:
         self.y = 600
         self.width = 40
         self.height = 60
-        self.color = (0, 255, 0)
+        self.image = pygame.image.load("sprites/walk_cycle.png")
+        self.rect = self.image.get_rect(topleft=(self.x, self.y))
         self.dx = 0
         self.dy = 0
         self.on_ground = False
@@ -42,7 +42,7 @@ class Player:
     # KI-Ende
 
     def draw(self):
-        pygame.draw.rect(self.screen, self.color, (self.x, self.y, self.width, self.height))
+        self.screen.blit(self.image, self.rect)
 
     def update_and_draw(self):
         self.move()

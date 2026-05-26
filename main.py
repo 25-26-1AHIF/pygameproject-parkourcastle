@@ -2,7 +2,6 @@ import pygame
 from Game.player import Player
 from game_variables.game_variables import GameVariables
 from game_variables.game_variables import GameScreens
-from Game.platform import Platform
 
 def main_screen(screen: pygame.Surface, clock: pygame.time.Clock) -> GameScreens:
     pygame.display.set_caption("Main Screen")
@@ -47,11 +46,6 @@ def main_screen(screen: pygame.Surface, clock: pygame.time.Clock) -> GameScreens
 def play_screen(screen, clock):
     pygame.display.set_caption("Play Screen")
     player = Player(screen)
-    platforms = [
-        Platform(100, 650, 200, 20),
-        Platform(400, 500, 200, 20),
-        Platform(700, 400, 200, 20)
-    ]
     running = True
     # Die Main Loop (Game Loop)
     while running:
@@ -67,8 +61,6 @@ def play_screen(screen, clock):
                     return GameScreens.EXIT
         screen.fill("black")
         Player.update_and_draw(player)
-        for p in platforms:
-            p.draw(screen)
         # Das Display updaten
         pygame.display.flip()
         # FPS überwachen
