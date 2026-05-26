@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ad0fc84f-e4dd-45ea-b1f9-0ac010cc5c26" name="Changes" comment="bilder mir geben">
+    <list default="true" id="ad0fc84f-e4dd-45ea-b1f9-0ac010cc5c26" name="Changes" comment="Player funktioniert. Kann jetzt laufen und springen inklusive Animationen">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Game/player.py" beforeDir="false" afterPath="$PROJECT_DIR$/Game/player.py" afterDir="false" />
     </list>
@@ -143,7 +143,15 @@
       <option name="project" value="LOCAL" />
       <updated>1779785370516</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="Player funktioniert. Kann jetzt laufen und springen inklusive Animationen">
+      <option name="closed" value="true" />
+      <created>1779793501588</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1779793501588</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -175,6 +183,7 @@
     <MESSAGE value="Controls-Fenster hinzugefügt. ein X-Knopf beim Controls-Fenster hinzugefügt. Wenn man den X-Knopf anklickt, landet man wieder im Hauptmenü!" />
     <MESSAGE value="gitignore für fehlerbehebung" />
     <MESSAGE value="bilder mir geben" />
-    <option name="LAST_COMMIT_MESSAGE" value="bilder mir geben" />
+    <MESSAGE value="Player funktioniert. Kann jetzt laufen und springen inklusive Animationen" />
+    <option name="LAST_COMMIT_MESSAGE" value="Player funktioniert. Kann jetzt laufen und springen inklusive Animationen" />
   </component>
 </project>

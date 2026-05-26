@@ -1,4 +1,4 @@
-from operator import invert
+import time
 
 import pygame
 from game_variables.game_variables import GameVariables
@@ -14,6 +14,9 @@ class Player:
 
         frame_width = sheet.get_width() // 4
         frame_height = sheet.get_height()
+
+        self.last_dash_time = 0
+        self.dash_cooldown = 1000
 
         self.frames = []
         for i in range(4):
@@ -44,14 +47,28 @@ class Player:
 
     def move(self):
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_a]:
+        if keys[pygame.K_a] and not keys[pygame.K_SPACE]:
             self.dx = -5
             self.animate_walk()
             self.image = self.image_left
-        elif keys[pygame.K_d]:
+        elif keys[pygame.K_d] and not keys[pygame.K_SPACE]:
             self.dx = 5
             self.animate_walk()
             self.image_left = self.image
+        elif keys[pygame.K_a] and keys[pygame.K_SPACE]:
+            now = pygame.time.get_ticks()
+            if now - self.last_dash_time > self.dash_cooldown:
+                self.dx = -20
+                self.animate_walk()
+                self.image = self.image_left
+                self.last_dash_time = now
+        elif keys[pygame.K_d] and keys[pygame.K_SPACE]:
+            now = pygame.time.get_ticks()
+            if now - self.last_dash_time > self.dash_cooldown:
+                self.dx = 20
+                self.animate_walk()
+                self.image_left = self.image
+                self.last_dash_time = 0
         else:
             self.dx = 0
             if self.image:
@@ -59,9 +76,15 @@ class Player:
             else:
                 self.image = self.image_left
 
-        if keys[pygame.K_w] and self.on_ground:
+        if keys[pygame.K_w] and self.on_ground and not keys[pygame.K_SPACE]:
             self.dy = -15
             self.on_ground = False
+        elif keys[pygame.K_w] and self.on_ground and keys[pygame.K_SPACE]:
+            now = pygame.time.get_ticks()
+            if now - self.last_dash_time > self.dash_cooldown:
+                self.dy = -30
+                self.on_ground = False
+                self.last_dash_time = 0
 
     # KI-Anfang
     # KI: Microsoft Copilot
@@ -74,6 +97,12 @@ class Player:
             self.image = self.frames[self.animation_index]
             self.image_left = self.frames_left[self.animation_index]
     # KI-Ende
+
+    def animate_dash(self):
+        self.animation_timer += 1
+        if self.animation_timer >= 10:
+            self.animation_timer = 0
+            self.animation_index = (self.animation_index + 1) % 3 + 1
 
     # KI-Anfang
     # KI: Microsoft Copilot
