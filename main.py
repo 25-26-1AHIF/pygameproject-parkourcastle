@@ -55,7 +55,6 @@ def play_screen(screen, clock):
     running = True
     # Die Main Loop (Game Loop)
     while running:
-        shoot = False
         # Jedes Ereignis (Event) durchgehen
         for event in pygame.event.get():
             # Das Spiel verlassen, falls der Benutzer das Fenster schließen möchte
@@ -67,7 +66,7 @@ def play_screen(screen, clock):
                     print("Escape gedrückt!")
                     return GameScreens.EXIT
         screen.fill("black")
-        player.update_and_draw()
+        Player.update_and_draw(player)
         for p in platforms:
             p.draw(screen)
         # Das Display updaten
