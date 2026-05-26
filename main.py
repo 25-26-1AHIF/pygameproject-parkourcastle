@@ -11,9 +11,9 @@ def main_screen(screen: pygame.Surface, clock: pygame.time.Clock) -> GameScreens
     BACKGROUND = pygame.transform.scale(BACKGROUND, (GameVariables.SCREEN_WIDTH, GameVariables.SCREEN_HEIGHT))
 
     # statische texte erstellen
-    titel_text = GameVariables.FONT_BIG.render("ParkourCastle", True, "black")
-    starten_text = GameVariables.FONT_MIDDLE.render("Starten", True, "black")
-    controls_text = GameVariables.FONT_MIDDLE.render("Steuerung", True, "black")
+    titel_text = GameVariables.FONT_BIG.render("ParkourCastle", True, "white")
+    starten_text = GameVariables.FONT_MIDDLE.render("START", True, "white")
+    controls_text = GameVariables.FONT_MIDDLE.render("CONTROLS", True, "white")
 
     titel_text_rect = titel_text.get_rect(center=(GameVariables.SCREEN_WIDTH/2, 100))
     starten_text_rect  = starten_text.get_rect(center=(GameVariables.SCREEN_WIDTH/2, 250))

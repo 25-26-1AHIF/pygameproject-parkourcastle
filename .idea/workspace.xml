@@ -4,10 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ad0fc84f-e4dd-45ea-b1f9-0ac010cc5c26" name="Changes" comment="TEMPORÄRER Hintergrund im Hauptmenü (nicht fix), dash mit cooldown funktioniert. charakter funktioniert">
+    <list default="true" id="ad0fc84f-e4dd-45ea-b1f9-0ac010cc5c26" name="Changes" comment="TEMPORÄRER Hintergrund mit Spieler bewegen">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Game/player.py" beforeDir="false" afterPath="$PROJECT_DIR$/Game/player.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sprites/background/bricks-background.png" beforeDir="false" afterPath="$PROJECT_DIR$/sprites/background/bricks-background.png" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -182,7 +182,15 @@
       <option name="project" value="LOCAL" />
       <updated>1779804161686</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="TEMPORÄRER Hintergrund mit Spieler bewegen">
+      <option name="closed" value="true" />
+      <created>1779821646417</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1779821646417</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -217,6 +225,7 @@
     <MESSAGE value="Player funktioniert. Kann jetzt laufen und springen inklusive Animationen" />
     <MESSAGE value="Cooldown für Dash. Noch NICHT fertig!" />
     <MESSAGE value="TEMPORÄRER Hintergrund im Hauptmenü (nicht fix), dash mit cooldown funktioniert. charakter funktioniert" />
-    <option name="LAST_COMMIT_MESSAGE" value="TEMPORÄRER Hintergrund im Hauptmenü (nicht fix), dash mit cooldown funktioniert. charakter funktioniert" />
+    <MESSAGE value="TEMPORÄRER Hintergrund mit Spieler bewegen" />
+    <option name="LAST_COMMIT_MESSAGE" value="TEMPORÄRER Hintergrund mit Spieler bewegen" />
   </component>
 </project>
