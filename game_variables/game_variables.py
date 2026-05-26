@@ -16,6 +16,7 @@ class GameVariables:
     @staticmethod
     def init():
         pygame.init()
+        pygame.display.set_mode((GameVariables.SCREEN_WIDTH, GameVariables.SCREEN_HEIGHT))
         GameVariables.FONT_BIG = pygame.font.SysFont("bahnschrift", 48, bold=True)
         GameVariables.FONT_MIDDLE = pygame.font.SysFont("bahnschrift", 30, bold=False)
         GameVariables.FONT_SMALL = pygame.font.SysFont("bahnschrift", 14, bold=False)

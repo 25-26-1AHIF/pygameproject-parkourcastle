@@ -1,15 +1,19 @@
 import pygame
+from pygments.styles.paraiso_light import BACKGROUND
+
 from Game.player import Player
 from game_variables.game_variables import GameVariables
 from game_variables.game_variables import GameScreens
 
 def main_screen(screen: pygame.Surface, clock: pygame.time.Clock) -> GameScreens:
     pygame.display.set_caption("Main Screen")
+    BACKGROUND = pygame.image.load("sprites/background/bricks-background.png")
+    BACKGROUND = pygame.transform.scale(BACKGROUND, (GameVariables.SCREEN_WIDTH, GameVariables.SCREEN_HEIGHT))
 
     # statische texte erstellen
-    titel_text = GameVariables.FONT_BIG.render("ParkourCastle", True, "white")
-    starten_text = GameVariables.FONT_MIDDLE.render("Starten", True, "white")
-    controls_text = GameVariables.FONT_MIDDLE.render("Steuerung", True, "white")
+    titel_text = GameVariables.FONT_BIG.render("ParkourCastle", True, "black")
+    starten_text = GameVariables.FONT_MIDDLE.render("Starten", True, "black")
+    controls_text = GameVariables.FONT_MIDDLE.render("Steuerung", True, "black")
 
     titel_text_rect = titel_text.get_rect(center=(GameVariables.SCREEN_WIDTH/2, 100))
     starten_text_rect  = starten_text.get_rect(center=(GameVariables.SCREEN_WIDTH/2, 250))
@@ -33,7 +37,7 @@ def main_screen(screen: pygame.Surface, clock: pygame.time.Clock) -> GameScreens
                     print("Controls gedrückt!")
                     return GameScreens.CONTROLS
 
-        screen.fill("black")
+        screen.blit(BACKGROUND, (0, 0))
         screen.blit(source=titel_text, dest=titel_text_rect)
         screen.blit(source=starten_text, dest=starten_text_rect)
         screen.blit(source=controls_text, dest=controls_text_rect)
