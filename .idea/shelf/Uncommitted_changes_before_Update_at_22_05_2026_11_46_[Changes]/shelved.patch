@@ -1,0 +1,33 @@
+Index: main.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import pygame\r\nfrom Game.player import Player\r\nfrom game_variables.game_variables import GameVariables\r\nfrom game_variables.game_variables import GameScreens\r\n\r\ndef main_screen(screen: pygame.Surface, clock: pygame.time.Clock) -> GameScreens:\r\n    pygame.display.set_caption(\"Main Screen\")\r\n\r\n    # statische texte erstellen\r\n    titel_text = GameVariables.FONT_BIG.render(\"WeltraumShooter\", True, \"white\")\r\n    starten_text = GameVariables.FONT_MIDDLE.render(\"Starten\", True, \"white\")\r\n    controls_text = GameVariables.FONT_MIDDLE.render(\"Steuerung\", True, \"white\")\r\n\r\n    titel_text_rect = titel_text.get_rect(center=(GameVariables.SCREEN_WIDTH/2, 100))\r\n    starten_text_rect  = starten_text.get_rect(center=(GameVariables.SCREEN_WIDTH/2, 250))\r\n    controls_text_rect = controls_text.get_rect(center=(GameVariables.SCREEN_WIDTH / 2, 400))\r\n\r\n    running = True\r\n    while running:\r\n        for event in pygame.event.get():\r\n            if event.type == pygame.QUIT:\r\n                running = False\r\n                exit(0)\r\n            if event.type == pygame.KEYDOWN:\r\n                if event.key == pygame.K_ESCAPE:\r\n                    return GameScreens.EXIT\r\n            if event.type == pygame.MOUSEBUTTONDOWN:\r\n                # klickposition event.pos (x, y)\r\n                if starten_text_rect.collidepoint(event.pos):\r\n                    print(\"Starten gedrückt!\")\r\n                    return GameScreens.PLAY\r\n                elif controls_text_rect.collidepoint(event.pos):\r\n                    print(\"Controls gedrückt!\")\r\n                    return GameScreens.CONTROLS\r\n\r\n        screen.fill(\"black\")\r\n        screen.blit(source=titel_text, dest=titel_text_rect)\r\n        screen.blit(source=starten_text, dest=starten_text_rect)\r\n        pygame.draw.rect(screen, (255, 0, 0), starten_text_rect, 1)\r\n        pygame.display.flip()\r\n        clock.tick(GameVariables.FPS)\r\n    pygame.quit()\r\n\r\ndef play_screen(screen, clock):\r\n    pygame.display.set_caption(\"Play Screen\")\r\n    player = Player(screen)\r\n    running = True\r\n    # Die Main Loop (Game Loop)\r\n    while running:\r\n        shoot = False\r\n        # Jedes Ereignis (Event) durchgehen\r\n        for event in pygame.event.get():\r\n            # Das Spiel verlassen, falls der Benutzer das Fenster schließen möchte\r\n            if event.type == pygame.QUIT:\r\n                running = False\r\n                exit(0)\r\n            if event.type == pygame.KEYDOWN:\r\n                if event.key == pygame.K_ESCAPE:\r\n                    print(\"Escape gedrückt!\")\r\n                    return GameScreens.EXIT\r\n        screen.fill(\"black\")\r\n        player.update_and_draw()\r\n        # Das Display updaten\r\n        pygame.display.flip()\r\n        # FPS überwachen\r\n        clock.tick(GameVariables.FPS)\r\n    pygame.quit()\r\n\r\ndef controls_screen(screen, clock):\r\n    pygame.display.set_caption(\"Controls Screen\")\r\n\r\n\r\n\r\ndef main():\r\n    GameVariables.init()\r\n    screen = pygame.display.set_mode((GameVariables.SCREEN_WIDTH, GameVariables.SCREEN_HEIGHT))\r\n    # Clock für die FPS Überwachung erstellen\r\n    clock = pygame.time.Clock()\r\n\r\n    while True:\r\n        if GameScreens.actual == GameScreens.MAIN:\r\n            GameScreens.actual = main_screen(screen, clock)\r\n        elif GameScreens.actual == GameScreens.PLAY:\r\n            GameScreens.actual = play_screen(screen, clock)\r\n        elif GameScreens.actual == GameScreens.EXIT:\r\n            GameScreens.actual = main_screen(screen, clock)\r\n        elif GameScreens.actual == GameScreens.CONTROLS:\r\n            GameScreens.actual = controls_screen(screen, clock)\r\n    pygame.quit()\r\n\r\nif __name__ == '__main__':\r\n    # pygame und fonts initialisieren\r\n    main()\r\n    ###
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/main.py b/main.py
+--- a/main.py	(revision a66f0be2a40931241f746de6a3cf52e59f058728)
++++ b/main.py	(date 1779442776475)
+@@ -7,7 +7,7 @@
+     pygame.display.set_caption("Main Screen")
+ 
+     # statische texte erstellen
+-    titel_text = GameVariables.FONT_BIG.render("WeltraumShooter", True, "white")
++    titel_text = GameVariables.FONT_BIG.render("ParkourCastle", True, "white")
+     starten_text = GameVariables.FONT_MIDDLE.render("Starten", True, "white")
+     controls_text = GameVariables.FONT_MIDDLE.render("Steuerung", True, "white")
+ 
+@@ -71,6 +71,7 @@
+ 
+ 
+ 
++
+ def main():
+     GameVariables.init()
+     screen = pygame.display.set_mode((GameVariables.SCREEN_WIDTH, GameVariables.SCREEN_HEIGHT))
+@@ -91,4 +92,3 @@
+ if __name__ == '__main__':
+     # pygame und fonts initialisieren
+     main()
+-    ###
+\ No newline at end of file
