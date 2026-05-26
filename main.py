@@ -49,8 +49,13 @@ def main_screen(screen: pygame.Surface, clock: pygame.time.Clock) -> GameScreens
 
 def play_screen(screen, clock):
     pygame.display.set_caption("Play Screen")
+    BACKGROUND = pygame.image.load("sprites/background/bricks-background.png")
+    BACKGROUND = pygame.transform.scale(BACKGROUND, (int(GameVariables.SCREEN_WIDTH * 1.5),
+                                                     int(GameVariables.SCREEN_HEIGHT)))
+
     player = Player(screen)
     running = True
+
     # Die Main Loop (Game Loop)
     while running:
         # Jedes Ereignis (Event) durchgehen
@@ -63,15 +68,38 @@ def play_screen(screen, clock):
                 if event.key == pygame.K_ESCAPE:
                     print("Escape gedrückt!")
                     return GameScreens.EXIT
-        screen.fill("black")
-        Player.update_and_draw(player)
+
+        camera_x = -player.rect.x + GameVariables.SCREEN_WIDTH // 2
+        camera_y = 0  # Kamera bleibt vertikal fixiert
+        target_y = -player.rect.y + GameVariables.SCREEN_HEIGHT * 0.7
+        camera_y += (target_y - camera_y) * 0.05
+
+        # Parallax berechnen (10% der Kamerabewegung)
+        parallax_x = camera_x * 0.1
+        parallax_y = camera_y * 0.1
+
+        # Hintergrund darf nicht aus dem Bild rutschen
+        max_x = 0
+        min_x = GameVariables.SCREEN_WIDTH - BACKGROUND.get_width()
+        max_y = 0
+        min_y = GameVariables.SCREEN_HEIGHT - BACKGROUND.get_height()
+
+        parallax_x = max(min(parallax_x, max_x), min_x)
+        parallax_y = max(min(parallax_y, max_y), min_y)
+
+        # Hintergrund zeichnen
+        screen.blit(BACKGROUND, (parallax_x, parallax_y))
+
+        # Player mit Kamera zeichnen
+        player.update_and_draw(camera_x, camera_y)
         # Das Display updaten
         pygame.display.flip()
-        # FPS überwachen
         clock.tick(GameVariables.FPS)
     pygame.quit()
 
 def controls_screen(screen, clock):
+    BACKGROUND = pygame.image.load("sprites/background/bricks-background.png")
+    BACKGROUND = pygame.transform.scale(BACKGROUND, (GameVariables.SCREEN_WIDTH, GameVariables.SCREEN_HEIGHT))
     steuerung_text = GameVariables.FONT_BIG.render("Steuerung", True, "white")
     springen_text = GameVariables.FONT_MIDDLE.render("W - Springen", True, "white")
     links_text = GameVariables.FONT_MIDDLE.render("A - Links", True, "white")

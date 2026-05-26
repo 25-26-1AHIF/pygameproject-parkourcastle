@@ -125,10 +125,13 @@ class Player:
             self.on_ground = True
     # KI-Ende
 
-    def draw(self):
-        self.screen.blit(self.image, self.rect)
+    def draw_with_camera(self, camera_x, camera_y):
+        self.screen.blit(self.image, (self.rect.x + camera_x,
+                                      self.rect.y + camera_y))
 
-    def update_and_draw(self):
+    def update_and_draw(self, camera_x, camera_y):
         self.move()
         self.physics()
-        self.draw()
+        self.draw_with_camera(camera_x, camera_y)
+
+
