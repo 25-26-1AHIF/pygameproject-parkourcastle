@@ -4,8 +4,18 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ad0fc84f-e4dd-45ea-b1f9-0ac010cc5c26" name="Changes" comment="Controls-Fenster hinzugefügt. ein X-Knopf beim Controls-Fenster hinzugefügt. Wenn man den X-Knopf anklickt, landet man wieder im Hauptmenü!">
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.gitignore" afterDir="false" />
+    <list default="true" id="ad0fc84f-e4dd-45ea-b1f9-0ac010cc5c26" name="Changes" comment="sprtes hinzugefügt">
+      <change afterPath="$PROJECT_DIR$/sprites/Spikes/Spikes.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/sprites/ground/Top_platform.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/sprites/ground/left_platform.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/sprites/ground/left_top_platform.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/sprites/ground/none_platform.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/sprites/ground/right_and_top_platform.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/sprites/ground/right_platform.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sprites/Dash.png" beforeDir="false" afterPath="$PROJECT_DIR$/sprites/player/Dash.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sprites/pixilart-sprite.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sprites/walk_cycle.png" beforeDir="false" afterPath="$PROJECT_DIR$/sprites/player/walk_cycle.png" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -52,9 +62,19 @@
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
     "git-widget-placeholder": "main",
+    "last_opened_file_path": "C:/Users/legka/OneDrive/Desktop/Pygame/code/pygameproject-parkourcastle/sprites/ground",
     "settings.editor.selected.configurable": "vcs.Git"
   }
 }]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\legka\OneDrive\Desktop\Pygame\code\pygameproject-parkourcastle\sprites\ground" />
+      <recent name="C:\Users\legka\OneDrive\Desktop\Pygame\code\pygameproject-parkourcastle\sprites\gegner" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\legka\OneDrive\Desktop\Pygame\code\pygameproject-parkourcastle\sprites\player" />
+    </key>
+  </component>
   <component name="RunManager">
     <configuration name="main" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
       <module name="pygameproject-parkourcastle" />
