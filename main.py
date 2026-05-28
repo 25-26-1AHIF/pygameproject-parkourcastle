@@ -2,8 +2,10 @@ import pygame
 from pygments.styles.paraiso_light import BACKGROUND
 
 from Game.player import Player
+from Game.Spike import Spikes
 from game_variables.game_variables import GameVariables
 from game_variables.game_variables import GameScreens
+
 
 def main_screen(screen: pygame.Surface, clock: pygame.time.Clock) -> GameScreens:
     pygame.display.set_caption("Main Screen")
@@ -15,8 +17,8 @@ def main_screen(screen: pygame.Surface, clock: pygame.time.Clock) -> GameScreens
     starten_text = GameVariables.FONT_MIDDLE.render("Starten", True, "black")
     controls_text = GameVariables.FONT_MIDDLE.render("Steuerung", True, "black")
 
-    titel_text_rect = titel_text.get_rect(center=(GameVariables.SCREEN_WIDTH/2, 100))
-    starten_text_rect  = starten_text.get_rect(center=(GameVariables.SCREEN_WIDTH/2, 250))
+    titel_text_rect = titel_text.get_rect(center=(GameVariables.SCREEN_WIDTH / 2, 100))
+    starten_text_rect = starten_text.get_rect(center=(GameVariables.SCREEN_WIDTH / 2, 250))
     controls_text_rect = controls_text.get_rect(center=(GameVariables.SCREEN_WIDTH / 2, 400))
 
     running = True
@@ -29,7 +31,6 @@ def main_screen(screen: pygame.Surface, clock: pygame.time.Clock) -> GameScreens
                 if event.key == pygame.K_ESCAPE:
                     return GameScreens.EXIT
             if event.type == pygame.MOUSEBUTTONDOWN:
-                # klickposition event.pos (x, y)
                 if starten_text_rect.collidepoint(event.pos):
                     print("Starten gedrückt!")
                     return GameScreens.PLAY
@@ -47,6 +48,7 @@ def main_screen(screen: pygame.Surface, clock: pygame.time.Clock) -> GameScreens
         clock.tick(GameVariables.FPS)
     pygame.quit()
 
+
 def play_screen(screen, clock):
     pygame.display.set_caption("Play Screen")
     BACKGROUND = pygame.image.load("sprites/background/bricks-background.png")
@@ -54,13 +56,12 @@ def play_screen(screen, clock):
                                                      int(GameVariables.SCREEN_HEIGHT)))
 
     player = Player(screen)
-    running = True
 
-    # Die Main Loop (Game Loop)
+    spikes = Spikes(x=600, player_rect=player.rect)
+
+    running = True
     while running:
-        # Jedes Ereignis (Event) durchgehen
         for event in pygame.event.get():
-            # Das Spiel verlassen, falls der Benutzer das Fenster schließen möchte
             if event.type == pygame.QUIT:
                 running = False
                 exit(0)
@@ -70,15 +71,13 @@ def play_screen(screen, clock):
                     return GameScreens.EXIT
 
         camera_x = -player.rect.x + GameVariables.SCREEN_WIDTH // 2
-        camera_y = 0  # Kamera bleibt vertikal fixiert
+        camera_y = 0
         target_y = -player.rect.y + GameVariables.SCREEN_HEIGHT * 0.7
         camera_y += (target_y - camera_y) * 0.05
 
-        # Parallax berechnen (10% der Kamerabewegung)
         parallax_x = camera_x * 0.1
         parallax_y = camera_y * 0.1
 
-        # Hintergrund darf nicht aus dem Bild rutschen
         max_x = 0
         min_x = GameVariables.SCREEN_WIDTH - BACKGROUND.get_width()
         max_y = 0
@@ -87,15 +86,17 @@ def play_screen(screen, clock):
         parallax_x = max(min(parallax_x, max_x), min_x)
         parallax_y = max(min(parallax_y, max_y), min_y)
 
-        # Hintergrund zeichnen
         screen.blit(BACKGROUND, (parallax_x, parallax_y))
 
-        # Player mit Kamera zeichnen
+        spikes.draw(screen, camera_x, camera_y)
+        if spikes.check_collision(player.rect):
+            return GameScreens.MAIN
+
         player.update_and_draw(camera_x, camera_y)
-        # Das Display updaten
         pygame.display.flip()
         clock.tick(GameVariables.FPS)
     pygame.quit()
+
 
 def controls_screen(screen, clock):
     BACKGROUND = pygame.image.load("sprites/background/bricks-background.png")
@@ -108,21 +109,20 @@ def controls_screen(screen, clock):
     sprung_dash_text = GameVariables.FONT_MIDDLE.render("Leertaste+W - Sprungdash", True, "white")
     links_dash_text = GameVariables.FONT_MIDDLE.render("Leertaste+A - Linksdash", True, "white")
     rechts_dash_text = GameVariables.FONT_MIDDLE.render("Leertaste+D - Rechtsdash", True, "white")
-    dash_erklaert_text = GameVariables.FONT_SMALL.render("DASH: Boostet dich kurz in die jeweilige ausgewählte Richtung nach vorne!", True, "red")
+    dash_erklaert_text = GameVariables.FONT_SMALL.render(
+        "DASH: Boostet dich kurz in die jeweilige ausgewählte Richtung nach vorne!", True, "red")
     x_text = GameVariables.FONT_BIG.render("X", True, "white")
 
-    steuerung_text_rect = steuerung_text.get_rect(center=(GameVariables.SCREEN_WIDTH/2, 50))
-    springen_text_rect = springen_text.get_rect(center=(GameVariables.SCREEN_WIDTH/4, 200))
-    links_text_rect = links_text.get_rect(center=(GameVariables.SCREEN_WIDTH*0.75, 200))
-    rechts_text_rect = rechts_text.get_rect(center=(GameVariables.SCREEN_WIDTH/4, 300))
-    escape_text_rect = escape_text.get_rect(center=(GameVariables.SCREEN_WIDTH*0.75, 300))
-    links_dash_text_rect = links_dash_text.get_rect(center=(GameVariables.SCREEN_WIDTH/4, 400))
-    rechts_dash_text_rect = rechts_dash_text.get_rect(center=(GameVariables.SCREEN_WIDTH*0.75, 400))
-    sprung_dash_text_rect = sprung_dash_text.get_rect(center=(GameVariables.SCREEN_WIDTH/2, 500))
-    dash_erklaert_text_rect = dash_erklaert_text.get_rect(center=(GameVariables.SCREEN_WIDTH/2, 700))
+    steuerung_text_rect = steuerung_text.get_rect(center=(GameVariables.SCREEN_WIDTH / 2, 50))
+    springen_text_rect = springen_text.get_rect(center=(GameVariables.SCREEN_WIDTH / 4, 200))
+    links_text_rect = links_text.get_rect(center=(GameVariables.SCREEN_WIDTH * 0.75, 200))
+    rechts_text_rect = rechts_text.get_rect(center=(GameVariables.SCREEN_WIDTH / 4, 300))
+    escape_text_rect = escape_text.get_rect(center=(GameVariables.SCREEN_WIDTH * 0.75, 300))
+    links_dash_text_rect = links_dash_text.get_rect(center=(GameVariables.SCREEN_WIDTH / 4, 400))
+    rechts_dash_text_rect = rechts_dash_text.get_rect(center=(GameVariables.SCREEN_WIDTH * 0.75, 400))
+    sprung_dash_text_rect = sprung_dash_text.get_rect(center=(GameVariables.SCREEN_WIDTH / 2, 500))
+    dash_erklaert_text_rect = dash_erklaert_text.get_rect(center=(GameVariables.SCREEN_WIDTH / 2, 700))
     x_text_rect = x_text.get_rect(center=(924, 63))
-
-
 
     pygame.display.set_caption("Controls Screen")
     running = True
@@ -157,12 +157,9 @@ def controls_screen(screen, clock):
     pygame.quit()
 
 
-
-
 def main():
     GameVariables.init()
     screen = pygame.display.set_mode((GameVariables.SCREEN_WIDTH, GameVariables.SCREEN_HEIGHT))
-    # Clock für die FPS Überwachung erstellen
     clock = pygame.time.Clock()
 
     while True:
@@ -176,6 +173,6 @@ def main():
             GameScreens.actual = controls_screen(screen, clock)
     pygame.quit()
 
+
 if __name__ == '__main__':
-    # pygame und fonts initialisieren
     main()
