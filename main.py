@@ -6,7 +6,7 @@ from game_variables.game_variables import GameScreens
 
 def main_screen(screen: pygame.Surface, clock: pygame.time.Clock) -> GameScreens:
     pygame.display.set_caption("Main Screen")
-    BACKGROUND = pygame.image.load("sprites/background/bricks-background.png")
+    BACKGROUND = pygame.image.load("sprites/background/Start_screen.png")
     BACKGROUND = pygame.transform.scale(BACKGROUND, (GameVariables.SCREEN_WIDTH, GameVariables.SCREEN_HEIGHT))
 
     # statische texte erstellen
