@@ -50,8 +50,8 @@ def main_screen(screen: pygame.Surface, clock: pygame.time.Clock) -> GameScreens
 def play_screen(screen, clock):
     pygame.display.set_caption("Play Screen")
     BACKGROUND = pygame.image.load("sprites/background/bricks-background.png")
-    BACKGROUND = pygame.transform.scale(BACKGROUND, (int(GameVariables.SCREEN_WIDTH * 1.5),
-                                                     int(GameVariables.SCREEN_HEIGHT)))
+    BACKGROUND = pygame.transform.scale(BACKGROUND, (int(GameVariables.SCREEN_WIDTH * 5),
+                                                     int(GameVariables.SCREEN_HEIGHT * 2.5)))
 
     player = Player(screen)
     running = True
