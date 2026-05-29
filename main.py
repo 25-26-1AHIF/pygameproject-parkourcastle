@@ -15,8 +15,8 @@ def main_screen(screen: pygame.Surface, clock: pygame.time.Clock) -> GameScreens
     controls_text = GameVariables.FONT_MIDDLE.render("CONTROLS", True, "white")
 
     titel_text_rect = titel_text.get_rect(center=(GameVariables.SCREEN_WIDTH/2, 100))
-    starten_text_rect  = starten_text.get_rect(center=(GameVariables.SCREEN_WIDTH/2, 250))
-    controls_text_rect = controls_text.get_rect(center=(GameVariables.SCREEN_WIDTH / 2, 400))
+    starten_text_rect  = starten_text.get_rect(center=(GameVariables.SCREEN_WIDTH/4, 250))
+    controls_text_rect = controls_text.get_rect(center=(GameVariables.SCREEN_WIDTH / 4, 400))
 
     running = True
     while running:
