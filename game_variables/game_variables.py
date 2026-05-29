@@ -4,7 +4,7 @@ import pygame
 class GameVariables:
     SCREEN_WIDTH = 1000
     SCREEN_HEIGHT = 720
-    SQUARE_SIZE = 32
+    SQUARE_SIZE = 64
     CLOSE_SIZE = 50
     FPS = 60
 

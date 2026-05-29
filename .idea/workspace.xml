@@ -4,8 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ad0fc84f-e4dd-45ea-b1f9-0ac010cc5c26" name="Changes" comment="TEMPORÄRER Hintergrund dunkler gemacht">
+    <list default="true" id="ad0fc84f-e4dd-45ea-b1f9-0ac010cc5c26" name="Changes" comment="aktuallisiert">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Game/player.py" beforeDir="false" afterPath="$PROJECT_DIR$/Game/player.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/game_variables/game_variables.py" beforeDir="false" afterPath="$PROJECT_DIR$/game_variables/game_variables.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -197,7 +199,23 @@
       <option name="project" value="LOCAL" />
       <updated>1779821997260</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="Aktualisert">
+      <option name="closed" value="true" />
+      <created>1780045757025</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1780045757025</updated>
+    </task>
+    <task id="LOCAL-00014" summary="aktuallisiert">
+      <option name="closed" value="true" />
+      <created>1780045846250</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1780045846250</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -234,6 +252,8 @@
     <MESSAGE value="TEMPORÄRER Hintergrund im Hauptmenü (nicht fix), dash mit cooldown funktioniert. charakter funktioniert" />
     <MESSAGE value="TEMPORÄRER Hintergrund mit Spieler bewegen" />
     <MESSAGE value="TEMPORÄRER Hintergrund dunkler gemacht" />
-    <option name="LAST_COMMIT_MESSAGE" value="TEMPORÄRER Hintergrund dunkler gemacht" />
+    <MESSAGE value="Aktualisert" />
+    <MESSAGE value="aktuallisiert" />
+    <option name="LAST_COMMIT_MESSAGE" value="aktuallisiert" />
   </component>
 </project>

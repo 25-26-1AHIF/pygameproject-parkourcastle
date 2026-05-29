@@ -1,5 +1,4 @@
 import pygame
-from pygments.styles.paraiso_light import BACKGROUND
 
 from Game.player import Player
 from game_variables.game_variables import GameVariables
@@ -52,6 +51,8 @@ def play_screen(screen, clock):
     BACKGROUND = pygame.image.load("sprites/background/bricks-background.png")
     BACKGROUND = pygame.transform.scale(BACKGROUND, (int(GameVariables.SCREEN_WIDTH * 5),
                                                      int(GameVariables.SCREEN_HEIGHT * 2.5)))
+    top_platform = pygame.image.load("sprites/ground/Top_platform.png")
+    top_platform = pygame.transform.scale(top_platform, (GameVariables.SQUARE_SIZE, GameVariables.SQUARE_SIZE))
 
     player = Player(screen)
     running = True
@@ -89,6 +90,19 @@ def play_screen(screen, clock):
 
         # Hintergrund zeichnen
         screen.blit(BACKGROUND, (parallax_x, parallax_y))
+        in_screen = True
+        screen.blit(top_platform,
+                    (parallax_x, 1.4 * GameVariables.SQUARE_SIZE * parallax_y + GameVariables.SCREEN_HEIGHT))
+        while in_screen:
+            parallax_x_new = parallax_x + GameVariables.SQUARE_SIZE
+            if parallax_x_new >= GameVariables.SCREEN_WIDTH:
+                in_screen = False
+            else:
+                screen.blit(top_platform,
+                            (parallax_x_new, 1.4 * GameVariables.SQUARE_SIZE * parallax_y + GameVariables.SCREEN_HEIGHT))
+                parallax_x = parallax_x_new
+
+
 
         # Player mit Kamera zeichnen
         player.update_and_draw(camera_x, camera_y)

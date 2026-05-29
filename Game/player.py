@@ -127,7 +127,7 @@ class Player:
 
     def draw_with_camera(self, camera_x, camera_y):
         self.screen.blit(self.image, (self.rect.x + camera_x,
-                                      self.rect.y + camera_y))
+                                      self.rect.y + camera_y - GameVariables.SQUARE_SIZE * 0.875))
 
     def update_and_draw(self, camera_x, camera_y):
         self.move()
