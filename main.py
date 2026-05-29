@@ -1,4 +1,5 @@
 import pygame
+import pygame.time
 
 from Game.player import Player
 from game_variables.game_variables import GameVariables
@@ -30,6 +31,7 @@ def main_screen(screen: pygame.Surface, clock: pygame.time.Clock) -> GameScreens
             if event.type == pygame.MOUSEBUTTONDOWN:
                 # klickposition event.pos (x, y)
                 if starten_text_rect.collidepoint(event.pos):
+                    counting = True
                     print("Starten gedrückt!")
                     return GameScreens.PLAY
                 elif controls_text_rect.collidepoint(event.pos):
@@ -48,9 +50,15 @@ def main_screen(screen: pygame.Surface, clock: pygame.time.Clock) -> GameScreens
 
 def play_screen(screen, clock):
     pygame.display.set_caption("Play Screen")
+    score = 0
+
+    highscore_text = GameVariables.FONT_MIDDLE.render(f"Score: {score}", True, "white")
+    highscore_text_rect = highscore_text.get_rect(center=(GameVariables.SCREEN_WIDTH - 100, 20))
+
     BACKGROUND = pygame.image.load("sprites/background/bricks-background.png")
     BACKGROUND = pygame.transform.scale(BACKGROUND, (int(GameVariables.SCREEN_WIDTH * 5),
                                                      int(GameVariables.SCREEN_HEIGHT * 2.5)))
+
     top_platform = pygame.image.load("sprites/ground/Top_platform.png")
     top_platform = pygame.transform.scale(top_platform, (GameVariables.SQUARE_SIZE, GameVariables.SQUARE_SIZE))
 
@@ -63,10 +71,12 @@ def play_screen(screen, clock):
         for event in pygame.event.get():
             # Das Spiel verlassen, falls der Benutzer das Fenster schließen möchte
             if event.type == pygame.QUIT:
+                counting = False
                 running = False
                 exit(0)
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
+                    counting = False
                     print("Escape gedrückt!")
                     return GameScreens.EXIT
 
@@ -88,8 +98,21 @@ def play_screen(screen, clock):
         parallax_x = max(min(parallax_x, max_x), min_x)
         parallax_y = max(min(parallax_y, max_y), min_y)
 
+
+
         # Hintergrund zeichnen
         screen.blit(BACKGROUND, (parallax_x, parallax_y))
+        counting = True
+        while counting:
+            screen.blit(source=highscore_text, dest=highscore_text_rect)
+            score_counter = pygame.time.get_ticks()
+            seconds = 1000
+            if score_counter >= seconds:
+                score += 1
+                screen.blit(source=highscore_text, dest=highscore_text_rect)
+                continue
+
+
         in_screen = True
         screen.blit(top_platform,
                     (parallax_x, 1.4 * GameVariables.SQUARE_SIZE * parallax_y + GameVariables.SCREEN_HEIGHT))
