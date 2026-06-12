@@ -1,5 +1,6 @@
 import pygame
 from game_variables.game_variables import GameVariables
+import random
 
 class Player:
     # KI-Anfang
@@ -112,26 +113,44 @@ class Player:
     # KI-Anfang
     # KI: Microsoft Copilot
     # prompt: wie erstelle ich Schwerkraft?
-    def physics(self):
+    def physics(self, ground):
+        plattform_oben = (
+                GameVariables.SCREEN_HEIGHT
+                - 2 * GameVariables.SQUARE_SIZE
+        )
         self.dy += 1
         self.rect.x += self.dx
         self.rect.y += self.dy
 
         self.do_dash()
 
-        if self.rect.bottom >= GameVariables.SCREEN_HEIGHT:
-            self.rect.bottom = GameVariables.SCREEN_HEIGHT
-            self.dy = 0
-            self.on_ground = True
+        self.on_ground = False
+
+        block_size = GameVariables.SQUARE_SIZE
+
+        # Auf welchem Block steht der Spieler?
+        player_block = self.rect.centerx // block_size
+
+        if 0 <= player_block < len(ground):
+
+            if ground[player_block]:
+
+                boden_y = GameVariables.SCREEN_HEIGHT - block_size
+
+                # Spieler fällt auf Plattform
+                if self.rect.bottom >= plattform_oben:
+                    self.rect.bottom = plattform_oben
+                    self.dy = 0
+                    self.on_ground = True
     # KI-Ende
+
+
 
     def draw_with_camera(self, camera_x, camera_y):
         self.screen.blit(self.image, (self.rect.x + camera_x,
-                                      self.rect.y + camera_y - GameVariables.SQUARE_SIZE * 0.875))
+                                      self.rect.y + camera_y))
 
-    def update_and_draw(self, camera_x, camera_y):
+    def update_and_draw(self, camera_x, camera_y, ground):
         self.move()
-        self.physics()
+        self.physics(ground)
         self.draw_with_camera(camera_x, camera_y)
-
-

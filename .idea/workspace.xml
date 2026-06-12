@@ -4,9 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ad0fc84f-e4dd-45ea-b1f9-0ac010cc5c26" name="Changes" comment="Highscore Counter - NOCH IN BEARBEITUNG!!!">
+    <list default="true" id="ad0fc84f-e4dd-45ea-b1f9-0ac010cc5c26" name="Changes" comment="Patch-Fixes">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/highscore/highscore.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Game/player.py" beforeDir="false" afterPath="$PROJECT_DIR$/Game/player.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -246,7 +246,15 @@
       <option name="project" value="LOCAL" />
       <updated>1780053970906</updated>
     </task>
-    <option name="localTasksCounter" value="19" />
+    <task id="LOCAL-00019" summary="Patch-Fixes">
+      <option name="closed" value="true" />
+      <created>1781256603307</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1781256603307</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -289,6 +297,7 @@
     <MESSAGE value="Hintergrund auf &quot;Start_screen.png&quot; geupdadet!" />
     <MESSAGE value="Texte nach links verschoben" />
     <MESSAGE value="Highscore Counter - NOCH IN BEARBEITUNG!!!" />
-    <option name="LAST_COMMIT_MESSAGE" value="Highscore Counter - NOCH IN BEARBEITUNG!!!" />
+    <MESSAGE value="Patch-Fixes" />
+    <option name="LAST_COMMIT_MESSAGE" value="Patch-Fixes" />
   </component>
 </project>

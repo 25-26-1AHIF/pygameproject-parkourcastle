@@ -1,5 +1,6 @@
 import pygame
 import pygame.time
+import random
 
 from Game.player import Player
 from game_variables.game_variables import GameVariables
@@ -48,6 +49,33 @@ def main_screen(screen: pygame.Surface, clock: pygame.time.Clock) -> GameScreens
         clock.tick(GameVariables.FPS)
     pygame.quit()
 
+import random
+
+def generate_ground():
+    ANZAHL_BLOECKE = 200
+
+    ground = []
+    i = 0
+
+    while i < ANZAHL_BLOECKE:
+
+        # 5% Chance auf eine Grube
+        if random.random() < 0.05:
+
+            # Grube mindestens 3 Blöcke lang
+            grubenlaenge = random.randint(2, 3)
+
+            for _ in range(grubenlaenge):
+                if i < ANZAHL_BLOECKE:
+                    ground.append(False)
+                    i += 1
+
+        else:
+            ground.append(True)
+            i += 1
+
+    return ground
+
 def play_screen(screen, clock):
     pygame.display.set_caption("Play Screen")
     score = 0
@@ -59,10 +87,14 @@ def play_screen(screen, clock):
     BACKGROUND = pygame.transform.scale(BACKGROUND, (int(GameVariables.SCREEN_WIDTH * 5),
                                                      int(GameVariables.SCREEN_HEIGHT * 2.5)))
 
+    none_platform = pygame.image.load("sprites/ground/none_platform.png")
+    none_platform = pygame.transform.scale(none_platform, (GameVariables.SQUARE_SIZE, GameVariables.SQUARE_SIZE))
+
     top_platform = pygame.image.load("sprites/ground/Top_platform.png")
     top_platform = pygame.transform.scale(top_platform, (GameVariables.SQUARE_SIZE, GameVariables.SQUARE_SIZE))
 
     player = Player(screen)
+    ground = generate_ground()
     running = True
 
     # Die Main Loop (Game Loop)
@@ -98,28 +130,28 @@ def play_screen(screen, clock):
         parallax_x = max(min(parallax_x, max_x), min_x)
         parallax_y = max(min(parallax_y, max_y), min_y)
 
-
-
         # Hintergrund zeichnen
         screen.blit(BACKGROUND, (parallax_x, parallax_y))
 
+        ground_y = GameVariables.SCREEN_HEIGHT - GameVariables.SQUARE_SIZE
 
-        in_screen = True
-        screen.blit(top_platform,
-                    (parallax_x, 1.4 * GameVariables.SQUARE_SIZE * parallax_y + GameVariables.SCREEN_HEIGHT))
-        while in_screen:
-            parallax_x_new = parallax_x + GameVariables.SQUARE_SIZE
-            if parallax_x_new >= GameVariables.SCREEN_WIDTH:
-                in_screen = False
-            else:
-                screen.blit(top_platform,
-                            (parallax_x_new, 1.4 * GameVariables.SQUARE_SIZE * parallax_y + GameVariables.SCREEN_HEIGHT))
-                parallax_x = parallax_x_new
+        for i, block in enumerate(ground):
 
+            if block:
+                x = i * GameVariables.SQUARE_SIZE + camera_x
 
+                screen.blit(
+                    none_platform,
+                    (x, ground_y)
+                )
+
+                screen.blit(
+                    top_platform,
+                    (x, ground_y - GameVariables.SQUARE_SIZE)
+                )
 
         # Player mit Kamera zeichnen
-        player.update_and_draw(camera_x, camera_y)
+        player.update_and_draw(camera_x, camera_y, ground)
         # Das Display updaten
         pygame.display.flip()
         clock.tick(GameVariables.FPS)
