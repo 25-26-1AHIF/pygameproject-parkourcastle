@@ -102,15 +102,6 @@ def play_screen(screen, clock):
 
         # Hintergrund zeichnen
         screen.blit(BACKGROUND, (parallax_x, parallax_y))
-        counting = True
-        while counting:
-            screen.blit(source=highscore_text, dest=highscore_text_rect)
-            score_counter = pygame.time.get_ticks()
-            seconds = 1000
-            if score_counter >= seconds:
-                score += 1
-                screen.blit(source=highscore_text, dest=highscore_text_rect)
-                continue
 
 
         in_screen = True
