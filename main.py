@@ -1,5 +1,7 @@
 import pygame
 import pygame.time
+
+from Game.highscore_manager import load_scores, save_scores, update_score
 import random
 
 from Game.player import Player
@@ -14,10 +16,12 @@ def main_screen(screen: pygame.Surface, clock: pygame.time.Clock) -> GameScreens
     # statische texte erstellen
     titel_text = GameVariables.FONT_BIG.render("ParkourCastle", True, "white")
     starten_text = GameVariables.FONT_MIDDLE.render("START", True, "white")
-    controls_text = GameVariables.FONT_MIDDLE.render("CONTROLS", True, "white")
+    controls_text = GameVariables.FONT_MIDDLE.render("STEUERUNG", True, "white")
+    highscores_text = GameVariables.FONT_MIDDLE.render("BESTENLISTE", True, "white")
 
     titel_text_rect = titel_text.get_rect(center=(GameVariables.SCREEN_WIDTH/2, 100))
     starten_text_rect  = starten_text.get_rect(center=(GameVariables.SCREEN_WIDTH/4, 250))
+    highscores_text_rect = highscores_text.get_rect(center=(GameVariables.SCREEN_WIDTH/4, 325))
     controls_text_rect = controls_text.get_rect(center=(GameVariables.SCREEN_WIDTH / 4, 400))
 
     running = True
@@ -34,17 +38,22 @@ def main_screen(screen: pygame.Surface, clock: pygame.time.Clock) -> GameScreens
                 if starten_text_rect.collidepoint(event.pos):
                     counting = True
                     print("Starten gedrückt!")
-                    return GameScreens.PLAY
+                    return GameScreens.NAME_INPUT
                 elif controls_text_rect.collidepoint(event.pos):
                     print("Controls gedrückt!")
                     return GameScreens.CONTROLS
+                elif highscores_text_rect.collidepoint(event.pos):
+                    print("Leaderboard gedrückt!")
+                    return GameScreens.HIGHSCORES
 
         screen.blit(BACKGROUND, (0, 0))
         screen.blit(source=titel_text, dest=titel_text_rect)
         screen.blit(source=starten_text, dest=starten_text_rect)
         screen.blit(source=controls_text, dest=controls_text_rect)
+        screen.blit(source=highscores_text, dest=highscores_text_rect)
         pygame.draw.rect(screen, (255, 0, 0), starten_text_rect, 1)
         pygame.draw.rect(screen, (255, 255, 0), controls_text_rect, 1)
+        pygame.draw.rect(screen, (0, 255, 255), highscores_text_rect, 1)
         pygame.display.flip()
         clock.tick(GameVariables.FPS)
     pygame.quit()
@@ -62,8 +71,8 @@ def generate_ground():
         # 5% Chance auf eine Grube
         if random.random() < 0.05:
 
-            # Grube mindestens 3 Blöcke lang
-            grubenlaenge = random.randint(2, 3)
+            # Grube mindestens 1 Block lang
+            grubenlaenge = random.randint(1, 2)
 
             for _ in range(grubenlaenge):
                 if i < ANZAHL_BLOECKE:
@@ -77,11 +86,10 @@ def generate_ground():
     return ground
 
 def play_screen(screen, clock):
+    GameVariables.SCORE = 0
+    score_timer = pygame.time.get_ticks()
     pygame.display.set_caption("Play Screen")
-    score = 0
 
-    highscore_text = GameVariables.FONT_MIDDLE.render(f"Score: {score}", True, "white")
-    highscore_text_rect = highscore_text.get_rect(center=(GameVariables.SCREEN_WIDTH - 100, 20))
 
     BACKGROUND = pygame.image.load("sprites/background/bricks-background.png")
     BACKGROUND = pygame.transform.scale(BACKGROUND, (int(GameVariables.SCREEN_WIDTH * 5),
@@ -99,6 +107,9 @@ def play_screen(screen, clock):
 
     # Die Main Loop (Game Loop)
     while running:
+        if pygame.time.get_ticks() - score_timer >= 1000:
+            GameVariables.SCORE += 1
+            score_timer = pygame.time.get_ticks()
         # Jedes Ereignis (Event) durchgehen
         for event in pygame.event.get():
             # Das Spiel verlassen, falls der Benutzer das Fenster schließen möchte
@@ -108,9 +119,14 @@ def play_screen(screen, clock):
                 exit(0)
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
+                    update_score(GameVariables.PLAYER_NAME, GameVariables.SCORE)
                     counting = False
                     print("Escape gedrückt!")
                     return GameScreens.EXIT
+        if player.rect.y >= GameVariables.SCREEN_HEIGHT:
+            update_score(GameVariables.PLAYER_NAME, GameVariables.SCORE)
+            return GameScreens.DEATH
+
 
         camera_x = -player.rect.x + GameVariables.SCREEN_WIDTH // 2
         camera_y = 0  # Kamera bleibt vertikal fixiert
@@ -132,6 +148,10 @@ def play_screen(screen, clock):
 
         # Hintergrund zeichnen
         screen.blit(BACKGROUND, (parallax_x, parallax_y))
+        score_text = GameVariables.FONT_BIG.render(f"Score: {GameVariables.SCORE}", True, "white")
+        name_text = GameVariables.FONT_MIDDLE.render(f"{GameVariables.PLAYER_NAME}", True, "white")
+        screen.blit(score_text, (GameVariables.SCREEN_WIDTH - 225, 50))
+        screen.blit(name_text, (25, 25))
 
         ground_y = GameVariables.SCREEN_HEIGHT - GameVariables.SQUARE_SIZE
 
@@ -187,6 +207,7 @@ def controls_screen(screen, clock):
     pygame.display.set_caption("Controls Screen")
     running = True
     while running:
+        close_button = pygame.draw.rect(screen, (255, 0, 0), (900, 36, 50, 50), border_radius=10)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -216,6 +237,105 @@ def controls_screen(screen, clock):
         clock.tick(GameVariables.FPS)
     pygame.quit()
 
+def name_input_screen(screen, clock):
+    pygame.display.set_caption("Name eingeben")
+
+    name = ""
+    font = GameVariables.FONT_BIG
+
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                exit(0)
+
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    GameVariables.PLAYER_NAME = name
+                    return GameScreens.PLAY
+
+                elif event.key == pygame.K_BACKSPACE:
+                    name = name[:-1]
+
+                else:
+                    if len(name) < 12:
+                        name += event.unicode
+        screen.fill("black")
+        text = font.render("Name: " + name, True, "white")
+        screen.blit(text, (100, 200))
+
+        pygame.display.flip()
+        clock.tick(60)
+
+
+def highscore_screen(screen, clock):
+    pygame.display.set_caption("Highscores")
+
+
+    scores = load_scores()
+    sorted_scores = sorted(scores.items(), key=lambda x: x[1], reverse=True)
+    x_text = GameVariables.FONT_BIG.render("X", True, "white")
+    x_text_rect = x_text.get_rect(center=(924, 63))
+    titel_text = GameVariables.FONT_BIG.render("Bestenliste", True, "white")
+    keine_spieler_text = pygame.font.SysFont("bahnschrift", 80, bold=True).render("! Keine Spieler gefunden !", True, "red")
+    keine_spieler_text_rect = keine_spieler_text.get_rect(center=(GameVariables.SCREEN_WIDTH/2, GameVariables.SCREEN_HEIGHT/2))
+    titel_text_rect = titel_text.get_rect(center=(GameVariables.SCREEN_WIDTH/2, 100))
+
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+                exit(0)
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    print("Escape gedrückt!")
+                    return GameScreens.EXIT
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if close_button.collidepoint(event.pos):
+                    print("Close-Button gedrückt!")
+                    return GameScreens.EXIT
+
+        screen.fill("black")
+        close_button = pygame.draw.rect(screen, (255, 0, 0), (900, 36, 50, 50), border_radius=10)
+        screen.blit(source=x_text, dest=x_text_rect)
+        screen.blit(source=titel_text, dest=titel_text_rect)
+        if not scores:
+            screen.blit(source=keine_spieler_text, dest=keine_spieler_text_rect)
+        y = 150
+        for name, score in sorted_scores:
+            text = GameVariables.FONT_MIDDLE.render(f"{name}: {score}", True, "gold")
+            screen.blit(text, (100, y))
+            y += 50
+
+        pygame.display.flip()
+        clock.tick(60)
+
+def death_screen(screen, clock):
+    pygame.display.set_caption("Death")
+
+    tod_text = pygame.font.SysFont("bahnschrift", 80, bold=True).render("Du bist gestorben...", True, "red")
+    tod_text_rect = tod_text.get_rect(center=(GameVariables.SCREEN_WIDTH/2, GameVariables.SCREEN_HEIGHT/2))
+    hauptmenu_text = GameVariables.FONT_MIDDLE.render("Hauptmenü", True, "white")
+    hauptmenu_text_rect = hauptmenu_text.get_rect(center=(GameVariables.SCREEN_WIDTH/2, GameVariables.SCREEN_HEIGHT/2 + 100))
+    screen.fill("black")
+    pygame.draw.rect(screen, "brown", hauptmenu_text_rect, border_radius=10)
+    screen.blit(source=tod_text, dest=tod_text_rect)
+    screen.blit(source=hauptmenu_text, dest=hauptmenu_text_rect)
+
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+                exit(0)
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if hauptmenu_text_rect.collidepoint(event.pos):
+                    print("Hauptmenü gedrückt!")
+                    return GameScreens.EXIT
+
+        pygame.display.flip()
+        clock.tick(60)
 
 
 
@@ -234,7 +354,14 @@ def main():
             GameScreens.actual = main_screen(screen, clock)
         elif GameScreens.actual == GameScreens.CONTROLS:
             GameScreens.actual = controls_screen(screen, clock)
-    pygame.quit()
+        elif GameScreens.actual == GameScreens.NAME_INPUT:
+            GameScreens.actual = name_input_screen(screen, clock)
+        elif GameScreens.actual == GameScreens.HIGHSCORES:
+            GameScreens.actual = highscore_screen(screen, clock)
+        elif GameScreens.actual == GameScreens.DEATH:
+            GameScreens.actual = death_screen(screen, clock)
+pygame.quit()
+
 
 if __name__ == '__main__':
     # pygame und fonts initialisieren

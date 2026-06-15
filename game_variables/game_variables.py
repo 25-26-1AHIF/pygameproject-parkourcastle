@@ -8,6 +8,10 @@ class GameVariables:
     CLOSE_SIZE = 50
     FPS = 60
 
+    PLAYER_NAME = ""
+    SCORE = 0
+    HIGHSCORE_FILE = "highscores.json"
+
 
     FONT_BIG = None
     FONT_MIDDLE = None
@@ -27,4 +31,7 @@ class GameScreens:
     PLAY = "play"
     CONTROLS = "controls"
     EXIT = "exit"
+    NAME_INPUT = "name_input"
+    HIGHSCORES = "highscores"
+    DEATH = "death"
     actual = MAIN

@@ -4,9 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ad0fc84f-e4dd-45ea-b1f9-0ac010cc5c26" name="Changes" comment="Patch-Fixes">
+    <list default="true" id="ad0fc84f-e4dd-45ea-b1f9-0ac010cc5c26" name="Changes" comment="Gruben wurden hinzugefügt">
+      <change afterPath="$PROJECT_DIR$/Game/highscore_manager.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Game/player.py" beforeDir="false" afterPath="$PROJECT_DIR$/Game/player.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/game_variables/game_variables.py" beforeDir="false" afterPath="$PROJECT_DIR$/game_variables/game_variables.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -254,7 +255,15 @@
       <option name="project" value="LOCAL" />
       <updated>1781256603307</updated>
     </task>
-    <option name="localTasksCounter" value="20" />
+    <task id="LOCAL-00020" summary="Gruben wurden hinzugefügt">
+      <option name="closed" value="true" />
+      <created>1781263697698</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1781263697698</updated>
+    </task>
+    <option name="localTasksCounter" value="21" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -298,6 +307,7 @@
     <MESSAGE value="Texte nach links verschoben" />
     <MESSAGE value="Highscore Counter - NOCH IN BEARBEITUNG!!!" />
     <MESSAGE value="Patch-Fixes" />
-    <option name="LAST_COMMIT_MESSAGE" value="Patch-Fixes" />
+    <MESSAGE value="Gruben wurden hinzugefügt" />
+    <option name="LAST_COMMIT_MESSAGE" value="Gruben wurden hinzugefügt" />
   </component>
 </project>
