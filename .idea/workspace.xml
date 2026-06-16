@@ -4,10 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ad0fc84f-e4dd-45ea-b1f9-0ac010cc5c26" name="Changes" comment="Gruben wurden hinzugefügt. Death-Screen hinzugefügt, inklusive &quot;Hauptmenü&quot; Button, welches zum Main Screen leitet. Death-Screen wird ausgelöst, wenn der Spieler den Bildschirm verlässt. Highscore hinzugefügt. Score wird jetzt im Play-Screen angezeigt. Nach Start wirst du aufgefordert einen Namen einzugeben, damit er im Highscore gespeichert werden kann. Sollte man denselben Namen wählen, so wird der aus der json wieder rausgeholt und neu gespeichert, falls ein neuer Highscore erreicht wurde. Name steht klein oben links im Play-Screen ebenfalls!&#10;&#10;Vincent Raven Schwindsackl, 15.06.2026 - 18:10:35">
+    <list default="true" id="ad0fc84f-e4dd-45ea-b1f9-0ac010cc5c26" name="Changes" comment="1. Credits-Screen wurde hinzugefügt.&#10;2. Respawn-Mechanik wurde hinzugefügt, um zu verhindern, in Spikes oder Gruben zu spawnen.&#10;3. Bestenliste hat nun Farben für Platzierungen.&#10;4. Spikes funktionieren und leitet dich sofort in den Death-Screen, wenn man Kontakt damit bekommt.&#10;5. Sprungkraft um 5 erhöht (15 &gt; 20), damit NORMALE Sprünge über Spikes möglich sind.&#10;&#10;Vincent Raven Schwindsackl, 15.06.2026 - 18:10:35">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Game/player.py" beforeDir="false" afterPath="$PROJECT_DIR$/Game/player.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/game_variables/game_variables.py" beforeDir="false" afterPath="$PROJECT_DIR$/game_variables/game_variables.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -271,7 +270,15 @@
       <option name="project" value="LOCAL" />
       <updated>1781539830994</updated>
     </task>
-    <option name="localTasksCounter" value="22" />
+    <task id="LOCAL-00022" summary="1. Credits-Screen wurde hinzugefügt.&#10;2. Respawn-Mechanik wurde hinzugefügt, um zu verhindern, in Spikes oder Gruben zu spawnen.&#10;3. Bestenliste hat nun Farben für Platzierungen.&#10;4. Spikes funktionieren und leitet dich sofort in den Death-Screen, wenn man Kontakt damit bekommt.&#10;5. Sprungkraft um 5 erhöht (15 &gt; 20), damit NORMALE Sprünge über Spikes möglich sind.&#10;&#10;Vincent Raven Schwindsackl, 15.06.2026 - 18:10:35">
+      <option name="closed" value="true" />
+      <created>1781601084178</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1781601084178</updated>
+    </task>
+    <option name="localTasksCounter" value="23" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -317,6 +324,7 @@
     <MESSAGE value="Patch-Fixes" />
     <MESSAGE value="Gruben wurden hinzugefügt" />
     <MESSAGE value="Gruben wurden hinzugefügt. Death-Screen hinzugefügt, inklusive &quot;Hauptmenü&quot; Button, welches zum Main Screen leitet. Death-Screen wird ausgelöst, wenn der Spieler den Bildschirm verlässt. Highscore hinzugefügt. Score wird jetzt im Play-Screen angezeigt. Nach Start wirst du aufgefordert einen Namen einzugeben, damit er im Highscore gespeichert werden kann. Sollte man denselben Namen wählen, so wird der aus der json wieder rausgeholt und neu gespeichert, falls ein neuer Highscore erreicht wurde. Name steht klein oben links im Play-Screen ebenfalls!&#10;&#10;Vincent Raven Schwindsackl, 15.06.2026 - 18:10:35" />
-    <option name="LAST_COMMIT_MESSAGE" value="Gruben wurden hinzugefügt. Death-Screen hinzugefügt, inklusive &quot;Hauptmenü&quot; Button, welches zum Main Screen leitet. Death-Screen wird ausgelöst, wenn der Spieler den Bildschirm verlässt. Highscore hinzugefügt. Score wird jetzt im Play-Screen angezeigt. Nach Start wirst du aufgefordert einen Namen einzugeben, damit er im Highscore gespeichert werden kann. Sollte man denselben Namen wählen, so wird der aus der json wieder rausgeholt und neu gespeichert, falls ein neuer Highscore erreicht wurde. Name steht klein oben links im Play-Screen ebenfalls!&#10;&#10;Vincent Raven Schwindsackl, 15.06.2026 - 18:10:35" />
+    <MESSAGE value="1. Credits-Screen wurde hinzugefügt.&#10;2. Respawn-Mechanik wurde hinzugefügt, um zu verhindern, in Spikes oder Gruben zu spawnen.&#10;3. Bestenliste hat nun Farben für Platzierungen.&#10;4. Spikes funktionieren und leitet dich sofort in den Death-Screen, wenn man Kontakt damit bekommt.&#10;5. Sprungkraft um 5 erhöht (15 &gt; 20), damit NORMALE Sprünge über Spikes möglich sind.&#10;&#10;Vincent Raven Schwindsackl, 15.06.2026 - 18:10:35" />
+    <option name="LAST_COMMIT_MESSAGE" value="1. Credits-Screen wurde hinzugefügt.&#10;2. Respawn-Mechanik wurde hinzugefügt, um zu verhindern, in Spikes oder Gruben zu spawnen.&#10;3. Bestenliste hat nun Farben für Platzierungen.&#10;4. Spikes funktionieren und leitet dich sofort in den Death-Screen, wenn man Kontakt damit bekommt.&#10;5. Sprungkraft um 5 erhöht (15 &gt; 20), damit NORMALE Sprünge über Spikes möglich sind.&#10;&#10;Vincent Raven Schwindsackl, 15.06.2026 - 18:10:35" />
   </component>
 </project>

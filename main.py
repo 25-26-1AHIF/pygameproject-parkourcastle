@@ -1,9 +1,8 @@
 import pygame
 import pygame.time
-
+from Game import player
 from Game.highscore_manager import load_scores, save_scores, update_score
 import random
-
 from Game.player import Player
 from game_variables.game_variables import GameVariables
 from game_variables.game_variables import GameScreens
@@ -120,6 +119,18 @@ def play_screen(screen, clock):
     for i, block in enumerate(ground):
         if block and random.random() < 0.1:  # 10% Chance für Spike
             spikes.append(i)
+    # Kamera-Variablen initialisieren (werden von set_camera genutzt)
+    camera_x = 0
+    camera_y = 0
+
+    # Closure, die respawn_player die Kamera sofort setzen lässt
+    def set_camera(x, y):
+        nonlocal camera_x, camera_y
+        camera_x = x
+        camera_y = y
+
+    # Sofort sicheren Spawn erzwingen (bereinigt spikes in Spawn-Umgebung)
+    spikes = respawn_player(player, ground, spikes, set_camera, clear_radius=2, spike_clear_radius=2, invuln_ms=1500)
 
     running = True
 
@@ -207,17 +218,13 @@ def play_screen(screen, clock):
                     spike_rect = pygame.Rect(spike_world_x, draw_y, spike_img_w, spike_img_h)
                     spike_rects.append(spike_rect)
 
-                    for r in spike_rects:
-                        pygame.draw.rect(screen, (255, 0, 0), (r.x + camera_x, r.y + camera_y, r.width, r.height), 1)
-
-                    spike_rects.append(spike_rect)
 
         # Player updaten und zeichnen (player.rect bleibt in Weltkoordinaten)
         player.update_and_draw(camera_x, camera_y, ground)
-
         # Spike-Kollision prüfen (Weltkoordinaten)
+        now = pygame.time.get_ticks()
         for spike in spike_rects:
-            if player.rect.colliderect(spike):
+            if player.rect.colliderect(spike) and now >= getattr(player, "invulnerable_until", 0):
                 update_score(GameVariables.PLAYER_NAME, GameVariables.SCORE)
                 return GameScreens.DEATH
 
@@ -389,6 +396,7 @@ def death_screen(screen, clock):
     pygame.draw.rect(screen, "brown", hauptmenu_text_rect, border_radius=10)
     screen.blit(source=tod_text, dest=tod_text_rect)
     screen.blit(source=hauptmenu_text, dest=hauptmenu_text_rect)
+    score_timer = pygame.time.get_ticks()
 
     running = True
     while running:
@@ -485,6 +493,7 @@ def clear_spikes_around(spikes, center, radius=2):
     return [s for s in spikes if abs(s - center) > radius]
 
 def respawn_player(player, ground, spikes, camera_setter=None, clear_radius=2, spike_clear_radius=2, invuln_ms=1000):
+    # finde sicheren Index
     idx = find_safe_spawn_index(ground, spikes, clear_radius)
     if idx is None:
         idx = 0
@@ -492,21 +501,37 @@ def respawn_player(player, ground, spikes, camera_setter=None, clear_radius=2, s
             idx += 1
         if idx >= len(ground):
             idx = 0
+
+    # entferne Spikes in der Nähe (synchron, bevor wir Spike-Rects bauen)
     spikes = clear_spikes_around(spikes, idx, spike_clear_radius)
+
+    # Weltkoordinaten für Spawn
     world_x = idx * GameVariables.SQUARE_SIZE
     top_world_y = GameVariables.SCREEN_HEIGHT - 2 * GameVariables.SQUARE_SIZE
+
+    # setze Spieler sauber (1px Puffer nach oben), reset Bewegung
     player.rect.x = world_x
-    player.rect.bottom = top_world_y
+    player.rect.bottom = top_world_y - 1
     player.dx = 0
     player.dy = 0
     player.on_ground = True
-    player.invulnerable_until = pygame.time.get_ticks() + invuln_ms
+
+    # Invulnerabilität setzen
+    # nach player.rect setzen
+    now = pygame.time.get_ticks()
+    player.invulnerable_until = now + 1000  # 1000 ms = 1 Sekunde Schutz
+    # optional: disable dash during invuln
+    player.can_dash = False
+    player.dash_disabled_until = now + 1000
+
+    # Kamera sofort zentrieren (falls gewünscht)
     if camera_setter:
         camera_x = -player.rect.x + GameVariables.SCREEN_WIDTH // 2
         camera_y = 0
         camera_setter(camera_x, camera_y)
-    return spikes, GameScreens.PLAY
 
+    # Rückgabe: aktualisierte spikes-Liste
+    return spikes
 
 def main():
     GameVariables.init()

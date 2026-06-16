@@ -14,6 +14,11 @@ class Player:
         frame_width = sheet.get_width() // 4
         frame_height = sheet.get_height()
 
+        # Player.__init__
+        self.invulnerable_until = 0
+        self.invulnerable = False  # optional, falls du Flag separat willst
+
+
         self.frames = [sheet.subsurface(pygame.Rect(i*frame_width,0,frame_width,frame_height)) for i in range(4)]
         self.frames_left = [pygame.transform.flip(f, True, False) for f in self.frames]
 
@@ -40,6 +45,11 @@ class Player:
         self.dash_step = 0
 
     def move(self):
+        # am Anfang von move() oder physics()
+        now = pygame.time.get_ticks()
+        if getattr(self, "dash_disabled_until", 0) and now >= self.dash_cooldown:
+            self.can_dash = True
+            self.dash_cooldown = 0
         keys = pygame.key.get_pressed()
 
         # Links / Rechts laufen
@@ -153,8 +163,13 @@ class Player:
     # KI-Ende
 
     def draw_with_camera(self, camera_x, camera_y):
-        self.screen.blit(self.image, (self.rect.x + camera_x,
-                                      self.rect.y + camera_y))
+        now = pygame.time.get_ticks()
+        if now < getattr(self, "invulnerable_until", 0):
+            # blink every 100 ms: draw only on alternating intervals
+            if (now // 100) % 2 == 0:
+                self.screen.blit(self.image, (self.rect.x + camera_x, self.rect.y + camera_y))
+        else:
+            self.screen.blit(self.image, (self.rect.x + camera_x, self.rect.y + camera_y))
 
     def update_and_draw(self, camera_x, camera_y, ground):
         self.move()
