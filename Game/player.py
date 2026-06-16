@@ -57,7 +57,7 @@ class Player:
 
         # Springen
         if keys[pygame.K_w] and self.on_ground:
-            self.dy = -15
+            self.dy = -20
             self.on_ground = False
 
         # Dash
@@ -114,37 +114,43 @@ class Player:
     # KI: Microsoft Copilot
     # prompt: wie erstelle ich Schwerkraft?
     def physics(self, ground):
-        plattform_oben = (
-                GameVariables.SCREEN_HEIGHT
-                - 2 * GameVariables.SQUARE_SIZE
-        )
+        # Bewegung anwenden
         self.dy += 1
         self.rect.x += self.dx
         self.rect.y += self.dy
 
         self.do_dash()
 
-        self.on_ground = False
+        # Top-Plattform Y (Weltkoordinate)
+        top_world_y = GameVariables.SCREEN_HEIGHT - 2 * GameVariables.SQUARE_SIZE
 
-        block_size = GameVariables.SQUARE_SIZE
+        # Fuß-Indizes berechnen (links und rechts)
+        left_index = self.rect.left // GameVariables.SQUARE_SIZE
+        right_index = (self.rect.right - 1) // GameVariables.SQUARE_SIZE
 
-        # Auf welchem Block steht der Spieler?
-        player_block = self.rect.centerx // block_size
+        # Prüfen, ob irgendein Fuß auf einem Block steht (sicherheitschecks für Indexbereich)
+        supported = False
+        n = len(ground)
+        if 0 <= left_index < n and ground[left_index]:
+            supported = True
+        if 0 <= right_index < n and ground[right_index]:
+            supported = True
 
-        if 0 <= player_block < len(ground):
-
-            if ground[player_block]:
-
-                boden_y = GameVariables.SCREEN_HEIGHT - block_size
-
-                # Spieler fällt auf Plattform
-                if self.rect.bottom >= plattform_oben:
-                    self.rect.bottom = plattform_oben
-                    self.dy = 0
-                    self.on_ground = True
+        if self.rect.bottom >= top_world_y:
+            if supported:
+                # Es gibt einen Block unter den Füßen -> aufsetzen
+                self.rect.bottom = top_world_y
+                self.dy = 0
+                self.on_ground = True
+            else:
+                # Kein Block unter den Füßen -> durchfallen
+                self.on_ground = False
+                # damit er nicht sofort wieder "snappt", gib ihm eine kleine positive Geschwindigkeit
+                if self.dy < 1:
+                    self.dy = 1
+        else:
+            self.on_ground = False
     # KI-Ende
-
-
 
     def draw_with_camera(self, camera_x, camera_y):
         self.screen.blit(self.image, (self.rect.x + camera_x,

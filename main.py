@@ -18,11 +18,13 @@ def main_screen(screen: pygame.Surface, clock: pygame.time.Clock) -> GameScreens
     starten_text = GameVariables.FONT_MIDDLE.render("START", True, "white")
     controls_text = GameVariables.FONT_MIDDLE.render("STEUERUNG", True, "white")
     highscores_text = GameVariables.FONT_MIDDLE.render("BESTENLISTE", True, "white")
+    credits_text = GameVariables.FONT_MIDDLE.render("CREDITS", True, "white")
 
     titel_text_rect = titel_text.get_rect(center=(GameVariables.SCREEN_WIDTH/2, 100))
     starten_text_rect  = starten_text.get_rect(center=(GameVariables.SCREEN_WIDTH/4, 250))
     highscores_text_rect = highscores_text.get_rect(center=(GameVariables.SCREEN_WIDTH/4, 325))
     controls_text_rect = controls_text.get_rect(center=(GameVariables.SCREEN_WIDTH / 4, 400))
+    credits_text_rect = credits_text.get_rect(center=(GameVariables.SCREEN_WIDTH / 4, 475))
 
     running = True
     while running:
@@ -45,15 +47,22 @@ def main_screen(screen: pygame.Surface, clock: pygame.time.Clock) -> GameScreens
                 elif highscores_text_rect.collidepoint(event.pos):
                     print("Leaderboard gedrückt!")
                     return GameScreens.HIGHSCORES
+                elif credits_text_rect.collidepoint(event.pos):
+                    print("Credits gedrückt!")
+                    return GameScreens.CREDITS
+
 
         screen.blit(BACKGROUND, (0, 0))
         screen.blit(source=titel_text, dest=titel_text_rect)
         screen.blit(source=starten_text, dest=starten_text_rect)
         screen.blit(source=controls_text, dest=controls_text_rect)
         screen.blit(source=highscores_text, dest=highscores_text_rect)
+        screen.blit(source=credits_text, dest=credits_text_rect)
+
         pygame.draw.rect(screen, (255, 0, 0), starten_text_rect, 1)
         pygame.draw.rect(screen, (255, 255, 0), controls_text_rect, 1)
         pygame.draw.rect(screen, (0, 255, 255), highscores_text_rect, 1)
+        pygame.draw.rect(screen, (255, 0, 255), credits_text_rect, 1)
         pygame.display.flip()
         clock.tick(GameVariables.FPS)
     pygame.quit()
@@ -101,8 +110,17 @@ def play_screen(screen, clock):
     top_platform = pygame.image.load("sprites/ground/Top_platform.png")
     top_platform = pygame.transform.scale(top_platform, (GameVariables.SQUARE_SIZE, GameVariables.SQUARE_SIZE))
 
+    spike_img = pygame.image.load("sprites/Spikes/Spikes.png")
+    spike_img = pygame.transform.scale(spike_img, (GameVariables.SQUARE_SIZE, GameVariables.SQUARE_SIZE))
+
     player = Player(screen)
     ground = generate_ground()
+    # Spikes generieren
+    spikes = []
+    for i, block in enumerate(ground):
+        if block and random.random() < 0.1:  # 10% Chance für Spike
+            spikes.append(i)
+
     running = True
 
     # Die Main Loop (Game Loop)
@@ -123,7 +141,7 @@ def play_screen(screen, clock):
                     counting = False
                     print("Escape gedrückt!")
                     return GameScreens.EXIT
-        if player.rect.y >= GameVariables.SCREEN_HEIGHT:
+        if player.rect.top > GameVariables.SCREEN_HEIGHT:
             update_score(GameVariables.PLAYER_NAME, GameVariables.SCORE)
             return GameScreens.DEATH
 
@@ -155,23 +173,54 @@ def play_screen(screen, clock):
 
         ground_y = GameVariables.SCREEN_HEIGHT - GameVariables.SQUARE_SIZE
 
+        spike_rects = []
+
         for i, block in enumerate(ground):
-
             if block:
-                x = i * GameVariables.SQUARE_SIZE + camera_x
+                # Weltkoordinaten (keine Kamera hier)
+                world_x = i * GameVariables.SQUARE_SIZE
+                world_ground_y = GameVariables.SCREEN_HEIGHT - GameVariables.SQUARE_SIZE
+                top_world_y = world_ground_y - GameVariables.SQUARE_SIZE
 
-                screen.blit(
-                    none_platform,
-                    (x, ground_y)
-                )
+                # Rects in Weltkoordinaten (nur für Logik / Debug)
+                rect1 = pygame.Rect(world_x, world_ground_y, GameVariables.SQUARE_SIZE, GameVariables.SQUARE_SIZE)
+                rect2 = pygame.Rect(world_x, top_world_y, GameVariables.SQUARE_SIZE, GameVariables.SQUARE_SIZE)
 
-                screen.blit(
-                    top_platform,
-                    (x, ground_y - GameVariables.SQUARE_SIZE)
-                )
+                # Zeichnen in Kamerakoordinaten (ADD camera offset)
+                screen.blit(none_platform, (world_x + camera_x, world_ground_y + camera_y))
+                screen.blit(top_platform, (world_x + camera_x, top_world_y + camera_y))
 
-        # Player mit Kamera zeichnen
+                # Spike zeichnen und Rect in Weltkoordinaten speichern (robust gegen Sprite-Höhe)
+                # Spike zeichnen und Rect in Weltkoordinaten speichern (korrekte Y-Ausrichtung)
+                if i in spikes:
+                    spike_world_x = world_x
+                    spike_top_y = top_world_y  # die Y-Position der Oberkante der Plattform
+
+                    spike_img_w = spike_img.get_width()
+                    spike_img_h = spike_img.get_height()
+
+                    # Zeichnen: Unterkante des Spike-Sprites auf spike_top_y setzen
+                    draw_y = spike_top_y - spike_img_h
+                    screen.blit(spike_img, (spike_world_x + camera_x, draw_y + camera_y))
+
+                    # Rect für Kollision: passt zur sichtbaren Sprite
+                    spike_rect = pygame.Rect(spike_world_x, draw_y, spike_img_w, spike_img_h)
+                    spike_rects.append(spike_rect)
+
+                    for r in spike_rects:
+                        pygame.draw.rect(screen, (255, 0, 0), (r.x + camera_x, r.y + camera_y, r.width, r.height), 1)
+
+                    spike_rects.append(spike_rect)
+
+        # Player updaten und zeichnen (player.rect bleibt in Weltkoordinaten)
         player.update_and_draw(camera_x, camera_y, ground)
+
+        # Spike-Kollision prüfen (Weltkoordinaten)
+        for spike in spike_rects:
+            if player.rect.colliderect(spike):
+                update_score(GameVariables.PLAYER_NAME, GameVariables.SCORE)
+                return GameScreens.DEATH
+
         # Das Display updaten
         pygame.display.flip()
         clock.tick(GameVariables.FPS)
@@ -253,6 +302,8 @@ def name_input_screen(screen, clock):
                 if event.key == pygame.K_RETURN:
                     GameVariables.PLAYER_NAME = name
                     return GameScreens.PLAY
+                elif event.key == pygame.K_ESCAPE:
+                    return GameScreens.EXIT
 
                 elif event.key == pygame.K_BACKSPACE:
                     name = name[:-1]
@@ -303,10 +354,26 @@ def highscore_screen(screen, clock):
         if not scores:
             screen.blit(source=keine_spieler_text, dest=keine_spieler_text_rect)
         y = 150
-        for name, score in sorted_scores:
-            text = GameVariables.FONT_MIDDLE.render(f"{name}: {score}", True, "gold")
-            screen.blit(text, (100, y))
-            y += 50
+        for idx, (name, score) in enumerate(sorted_scores):
+            if idx == 0:
+                text = GameVariables.FONT_MIDDLE.render(f"1. {name} - {score}s", True, "gold")
+                screen.blit(text, (100, y))
+                y += 75
+
+            if idx == 1:
+                text = GameVariables.FONT_MIDDLE.render(f"2. {name} - {score}s", True, "silver")
+                screen.blit(text, (100, y))
+                y += 75
+
+            if idx == 2:
+                text = GameVariables.FONT_MIDDLE.render(f"3. {name} - {score}s", True, "brown")
+                screen.blit(text, (100, y))
+                y += 75
+
+            if idx >= 3:
+                text = GameVariables.FONT_MIDDLE.render(f"4. {name} - {score}s", True, "white")
+                screen.blit(text, (100, y))
+                y += 75
 
         pygame.display.flip()
         clock.tick(60)
@@ -337,6 +404,108 @@ def death_screen(screen, clock):
         pygame.display.flip()
         clock.tick(60)
 
+def credits_screen(screen, clock):
+    pygame.display.set_caption("Credits")
+
+    BACKGROUND = pygame.image.load("sprites/background/bricks-background.png")
+    BACKGROUND = pygame.transform.scale(BACKGROUND, (GameVariables.SCREEN_WIDTH, GameVariables.SCREEN_HEIGHT))
+
+    titel_text = GameVariables.FONT_BIG.render("Credits", True, "white")
+    titel_rect = titel_text.get_rect(center=(GameVariables.SCREEN_WIDTH/2, 100))
+
+    # Beispiel-Credits
+    dev_text = GameVariables.FONT_MIDDLE.render("Entwickler: Vincent Raven Schwindsackl und Levin Hagen", True, "gold")
+    dev_rect = dev_text.get_rect(center=(GameVariables.SCREEN_WIDTH/2, 250))
+
+    art_text = GameVariables.FONT_MIDDLE.render("Grafiken: Levin Hagen - Eigene Assets", True, "white")
+    art_rect = art_text.get_rect(center=(GameVariables.SCREEN_WIDTH/2, 325))
+
+    music_text = GameVariables.FONT_MIDDLE.render("Musik/SFX: Levin Hagen - Eigene Sounds", True, "white")
+    music_rect = music_text.get_rect(center=(GameVariables.SCREEN_WIDTH/2, 400))
+
+    first_thanks_text = GameVariables.FONT_MIDDLE.render("Spezielles Dankeschön an: Die Lehrer für das beibringen", True, "white")
+    second_thanks_text = GameVariables.FONT_MIDDLE.render("Levin Hagen für die Sounds und Grafiken und", True, "white")
+    third_thanks_text = GameVariables.FONT_MIDDLE.render("Vincent Raven Schwindsackl für den Code!", True, "white")
+
+    first_thanks_rect = first_thanks_text.get_rect(center=(GameVariables.SCREEN_WIDTH/2, 475))
+    second_thanks_rect = second_thanks_text.get_rect(center=(GameVariables.SCREEN_WIDTH/2, 525))
+    third_thanks_rect = third_thanks_text.get_rect(center=(GameVariables.SCREEN_WIDTH/2, 575))
+
+    x_text = GameVariables.FONT_BIG.render("X", True, "white")
+    x_rect = x_text.get_rect(center=(924, 63))
+    close_button = pygame.Rect(900, 36, 50, 50)
+
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                exit(0)
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    return GameScreens.EXIT
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if close_button.collidepoint(event.pos):
+                    return GameScreens.EXIT
+
+        screen.blit(BACKGROUND, (0, 0))
+        pygame.draw.rect(screen, (255, 0, 0), close_button, border_radius=10)
+        screen.blit(x_text, x_rect)
+
+        screen.blit(titel_text, titel_rect)
+        screen.blit(dev_text, dev_rect)
+        screen.blit(art_text, art_rect)
+        screen.blit(music_text, music_rect)
+        screen.blit(first_thanks_text, first_thanks_rect)
+        screen.blit(second_thanks_text, second_thanks_rect)
+        screen.blit(third_thanks_text, third_thanks_rect)
+
+        pygame.display.flip()
+        clock.tick(GameVariables.FPS)
+
+import random
+import pygame
+
+def find_safe_spawn_index(ground, spikes, clear_radius=2, tries=200):
+    n = len(ground)
+    for _ in range(tries):
+        i = random.randrange(n)
+        left = max(0, i - clear_radius)
+        right = min(n-1, i + clear_radius)
+        if all(ground[left:right+1]) and i not in spikes:
+            return i
+    # Fallback: lineare Suche
+    for i in range(n):
+        left = max(0, i - clear_radius)
+        right = min(n-1, i + clear_radius)
+        if all(ground[left:right+1]) and i not in spikes:
+            return i
+    return None
+
+def clear_spikes_around(spikes, center, radius=2):
+    return [s for s in spikes if abs(s - center) > radius]
+
+def respawn_player(player, ground, spikes, camera_setter=None, clear_radius=2, spike_clear_radius=2, invuln_ms=1000):
+    idx = find_safe_spawn_index(ground, spikes, clear_radius)
+    if idx is None:
+        idx = 0
+        while idx < len(ground) and not ground[idx]:
+            idx += 1
+        if idx >= len(ground):
+            idx = 0
+    spikes = clear_spikes_around(spikes, idx, spike_clear_radius)
+    world_x = idx * GameVariables.SQUARE_SIZE
+    top_world_y = GameVariables.SCREEN_HEIGHT - 2 * GameVariables.SQUARE_SIZE
+    player.rect.x = world_x
+    player.rect.bottom = top_world_y
+    player.dx = 0
+    player.dy = 0
+    player.on_ground = True
+    player.invulnerable_until = pygame.time.get_ticks() + invuln_ms
+    if camera_setter:
+        camera_x = -player.rect.x + GameVariables.SCREEN_WIDTH // 2
+        camera_y = 0
+        camera_setter(camera_x, camera_y)
+    return spikes, GameScreens.PLAY
 
 
 def main():
@@ -360,6 +529,9 @@ def main():
             GameScreens.actual = highscore_screen(screen, clock)
         elif GameScreens.actual == GameScreens.DEATH:
             GameScreens.actual = death_screen(screen, clock)
+        elif GameScreens.actual == GameScreens.CREDITS:
+            GameScreens.actual = credits_screen(screen, clock)
+
 pygame.quit()
 
 

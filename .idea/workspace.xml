@@ -4,9 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ad0fc84f-e4dd-45ea-b1f9-0ac010cc5c26" name="Changes" comment="Gruben wurden hinzugefügt">
-      <change afterPath="$PROJECT_DIR$/Game/highscore_manager.py" afterDir="false" />
+    <list default="true" id="ad0fc84f-e4dd-45ea-b1f9-0ac010cc5c26" name="Changes" comment="Gruben wurden hinzugefügt. Death-Screen hinzugefügt, inklusive &quot;Hauptmenü&quot; Button, welches zum Main Screen leitet. Death-Screen wird ausgelöst, wenn der Spieler den Bildschirm verlässt. Highscore hinzugefügt. Score wird jetzt im Play-Screen angezeigt. Nach Start wirst du aufgefordert einen Namen einzugeben, damit er im Highscore gespeichert werden kann. Sollte man denselben Namen wählen, so wird der aus der json wieder rausgeholt und neu gespeichert, falls ein neuer Highscore erreicht wurde. Name steht klein oben links im Play-Screen ebenfalls!&#10;&#10;Vincent Raven Schwindsackl, 15.06.2026 - 18:10:35">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Game/player.py" beforeDir="false" afterPath="$PROJECT_DIR$/Game/player.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/game_variables/game_variables.py" beforeDir="false" afterPath="$PROJECT_DIR$/game_variables/game_variables.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
@@ -263,7 +263,15 @@
       <option name="project" value="LOCAL" />
       <updated>1781263697698</updated>
     </task>
-    <option name="localTasksCounter" value="21" />
+    <task id="LOCAL-00021" summary="Gruben wurden hinzugefügt. Death-Screen hinzugefügt, inklusive &quot;Hauptmenü&quot; Button, welches zum Main Screen leitet. Death-Screen wird ausgelöst, wenn der Spieler den Bildschirm verlässt. Highscore hinzugefügt. Score wird jetzt im Play-Screen angezeigt. Nach Start wirst du aufgefordert einen Namen einzugeben, damit er im Highscore gespeichert werden kann. Sollte man denselben Namen wählen, so wird der aus der json wieder rausgeholt und neu gespeichert, falls ein neuer Highscore erreicht wurde. Name steht klein oben links im Play-Screen ebenfalls!&#10;&#10;Vincent Raven Schwindsackl, 15.06.2026 - 18:10:35">
+      <option name="closed" value="true" />
+      <created>1781539830994</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1781539830994</updated>
+    </task>
+    <option name="localTasksCounter" value="22" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -308,6 +316,7 @@
     <MESSAGE value="Highscore Counter - NOCH IN BEARBEITUNG!!!" />
     <MESSAGE value="Patch-Fixes" />
     <MESSAGE value="Gruben wurden hinzugefügt" />
-    <option name="LAST_COMMIT_MESSAGE" value="Gruben wurden hinzugefügt" />
+    <MESSAGE value="Gruben wurden hinzugefügt. Death-Screen hinzugefügt, inklusive &quot;Hauptmenü&quot; Button, welches zum Main Screen leitet. Death-Screen wird ausgelöst, wenn der Spieler den Bildschirm verlässt. Highscore hinzugefügt. Score wird jetzt im Play-Screen angezeigt. Nach Start wirst du aufgefordert einen Namen einzugeben, damit er im Highscore gespeichert werden kann. Sollte man denselben Namen wählen, so wird der aus der json wieder rausgeholt und neu gespeichert, falls ein neuer Highscore erreicht wurde. Name steht klein oben links im Play-Screen ebenfalls!&#10;&#10;Vincent Raven Schwindsackl, 15.06.2026 - 18:10:35" />
+    <option name="LAST_COMMIT_MESSAGE" value="Gruben wurden hinzugefügt. Death-Screen hinzugefügt, inklusive &quot;Hauptmenü&quot; Button, welches zum Main Screen leitet. Death-Screen wird ausgelöst, wenn der Spieler den Bildschirm verlässt. Highscore hinzugefügt. Score wird jetzt im Play-Screen angezeigt. Nach Start wirst du aufgefordert einen Namen einzugeben, damit er im Highscore gespeichert werden kann. Sollte man denselben Namen wählen, so wird der aus der json wieder rausgeholt und neu gespeichert, falls ein neuer Highscore erreicht wurde. Name steht klein oben links im Play-Screen ebenfalls!&#10;&#10;Vincent Raven Schwindsackl, 15.06.2026 - 18:10:35" />
   </component>
 </project>

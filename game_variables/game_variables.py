@@ -34,4 +34,5 @@ class GameScreens:
     NAME_INPUT = "name_input"
     HIGHSCORES = "highscores"
     DEATH = "death"
+    CREDITS = "credits"
     actual = MAIN
