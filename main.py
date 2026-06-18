@@ -93,11 +93,11 @@ def generate_ground():
 
     return ground
 
+
 def play_screen(screen, clock):
     GameVariables.SCORE = 0
     score_timer = pygame.time.get_ticks()
     pygame.display.set_caption("Play Screen")
-
 
     BACKGROUND = pygame.image.load("sprites/background/bricks-background.png")
     BACKGROUND = pygame.transform.scale(BACKGROUND, (int(GameVariables.SCREEN_WIDTH * 5),
@@ -114,15 +114,112 @@ def play_screen(screen, clock):
 
     player = Player(screen)
     ground = generate_ground()
-    # Spikes generieren
+
+    # Spikes überall auf der Map generieren
     spikes = []
     for i, block in enumerate(ground):
         if block and random.random() < 0.1:  # 10% Chance für Spike
             spikes.append(i)
-    # Kamera-Variablen initialisieren (werden von set_camera genutzt)
-    camera_x = 0
-    camera_y = 0
 
+    # ==========================================================================================
+    # GEMINI: Fix für den Prompt "fixe bitte in diesem code das die spikes in player spawnen können"
+
+    spikes = clear_spikes_around(spikes, center=0, radius=3)
+
+    # Spieler standardmäßig auf den ersten Block setzen
+    player.rect.x = 0
+    player.rect.bottom = GameVariables.SCREEN_HEIGHT - 2 * GameVariables.SQUARE_SIZE
+    player.dx = 0
+    player.dy = 0
+    player.on_ground = True
+
+    running = True
+    while running:
+        if pygame.time.get_ticks() - score_timer >= 1000:
+            GameVariables.SCORE += 1
+            score_timer = pygame.time.get_ticks()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit(0)
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    update_score(GameVariables.PLAYER_NAME, GameVariables.SCORE)
+                    print("Escape gedrückt!")
+                    return GameScreens.EXIT
+
+        if player.rect.top > GameVariables.SCREEN_HEIGHT:
+            update_score(GameVariables.PLAYER_NAME, GameVariables.SCORE)
+            return GameScreens.DEATH
+
+        # Kamera berechnen
+        camera_x = -player.rect.x + GameVariables.SCREEN_WIDTH // 2
+        camera_y = 0
+        target_y = -player.rect.y + GameVariables.SCREEN_HEIGHT * 0.7
+        camera_y += (target_y - camera_y) * 0.05
+
+        # Parallax berechnen
+        parallax_x = camera_x * 0.1
+        parallax_y = camera_y * 0.1
+
+        max_x = 0
+        min_x = GameVariables.SCREEN_WIDTH - BACKGROUND.get_width()
+        max_y = 0
+        min_y = GameVariables.SCREEN_HEIGHT - BACKGROUND.get_height()
+
+        parallax_x = max(min(parallax_x, max_x), min_x)
+        parallax_y = max(min(parallax_y, max_y), min_y)
+
+        # Hintergrund zeichnen
+        screen.blit(BACKGROUND, (parallax_x, parallax_y))
+        score_text = GameVariables.FONT_BIG.render(f"Score: {GameVariables.SCORE}", True, "white")
+        name_text = GameVariables.FONT_MIDDLE.render(f"{GameVariables.PLAYER_NAME}", True, "white")
+        screen.blit(score_text, (GameVariables.SCREEN_WIDTH - 225, 50))
+        screen.blit(name_text, (25, 25))
+
+        spike_rects = []
+
+        for i, block in enumerate(ground):
+            if block:
+                world_x = i * GameVariables.SQUARE_SIZE
+                world_ground_y = GameVariables.SCREEN_HEIGHT - GameVariables.SQUARE_SIZE
+                top_world_y = world_ground_y - GameVariables.SQUARE_SIZE
+
+                # Zeichnen in Kamerakoordinaten
+                screen.blit(none_platform, (world_x + camera_x, world_ground_y + camera_y))
+                screen.blit(top_platform, (world_x + camera_x, top_world_y + camera_y))
+
+                # Spike zeichnen und Rect speichern
+                if i in spikes:
+                    spike_world_x = world_x
+                    spike_top_y = top_world_y
+
+                    spike_img_w = spike_img.get_width()
+                    spike_img_h = spike_img.get_height()
+
+                    draw_y = spike_top_y - spike_img_h
+                    screen.blit(spike_img, (spike_world_x + camera_x, draw_y + camera_y))
+
+                    spike_rect = pygame.Rect(spike_world_x, draw_y, spike_img_w, spike_img_h)
+                    spike_rects.append(spike_rect)
+
+                    # Debug-Hitbox zeichnen
+                    pygame.draw.rect(screen, (255, 0, 0),
+                                     (spike_rect.x + camera_x, spike_rect.y + camera_y, spike_rect.width,
+                                      spike_rect.height), 1)
+
+        # Player updaten und zeichnen
+        player.update_and_draw(camera_x, camera_y, ground)
+
+        # Spike-Kollision prüfen
+        for spike in spike_rects:
+            if player.rect.colliderect(spike):
+                update_score(GameVariables.PLAYER_NAME, GameVariables.SCORE)
+                return GameScreens.DEATH
+
+        pygame.display.flip()
+        clock.tick(GameVariables.FPS)
     # Closure, die respawn_player die Kamera sofort setzen lässt
     def set_camera(x, y):
         nonlocal camera_x, camera_y
