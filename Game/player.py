@@ -1,31 +1,26 @@
+# player.py
 import pygame
 from game_variables.game_variables import GameVariables
-import random
 
 class Player:
-    # KI-Anfang
-    # KI: Microsoft Copilot
-    # prompt: wie erstelle ich ein png in frames und wie mache ich den dash und cooldown?
     def __init__(self, screen):
         self.screen = screen
+        # Load sprite sheet (4 frames assumed)
         sheet = pygame.image.load("sprites/player/walk_cycle.png").convert_alpha()
+        # scale to reasonable size (adjust if needed)
         sheet = pygame.transform.scale(sheet, (175, 75))
 
         frame_width = sheet.get_width() // 4
         frame_height = sheet.get_height()
 
-        # Player.__init__
-        self.invulnerable_until = 0
-        self.invulnerable = False  # optional, falls du Flag separat willst
-
-
         self.frames = [sheet.subsurface(pygame.Rect(i*frame_width,0,frame_width,frame_height)) for i in range(4)]
         self.frames_left = [pygame.transform.flip(f, True, False) for f in self.frames]
 
         self.image = self.frames[0]
+        # initial rect; respawn will place player correctly
         self.rect = self.image.get_rect(topleft=(100, 600))
 
-        # Bewegung
+        # Movement
         self.dx = 0
         self.dy = 0
         self.on_ground = False
@@ -44,15 +39,14 @@ class Player:
         self.dash_frames_left = 0
         self.dash_step = 0
 
+        # Invulnerability and dash disable timers
+        self.invulnerable_until = 0
+        self.dash_disabled_until = 0
+
     def move(self):
-        # am Anfang von move() oder physics()
-        now = pygame.time.get_ticks()
-        if getattr(self, "dash_disabled_until", 0) and now >= self.dash_cooldown:
-            self.can_dash = True
-            self.dash_cooldown = 0
         keys = pygame.key.get_pressed()
 
-        # Links / Rechts laufen
+        # Left / Right
         if keys[pygame.K_a]:
             self.dx = -5
             self.facing_right = False
@@ -65,12 +59,12 @@ class Player:
             self.dx = 0
             self.image = self.frames[0] if self.facing_right else self.frames_left[0]
 
-        # Springen
+        # Jump
         if keys[pygame.K_w] and self.on_ground:
-            self.dy = -20
+            self.dy = -15
             self.on_ground = False
 
-        # Dash
+        # Dash input handling (space)
         now = pygame.time.get_ticks()
         if keys[pygame.K_SPACE]:
             if not self.space_was_pressed:
@@ -82,12 +76,16 @@ class Player:
         else:
             self.space_was_pressed = False
 
-        # Cooldown reset
+        # Reactivate dash if cooldown passed
         if not self.can_dash and now - self.last_dash_time >= self.dash_cooldown:
             self.can_dash = True
 
+        # Reactivate dash if disabled by respawn invuln
+        if getattr(self, "dash_disabled_until", 0) and now >= self.dash_disabled_until:
+            self.can_dash = True
+            self.dash_disabled_until = 0
+
     def start_dash(self):
-        # 20 Pixel über 5 Frames = 4 Pixel pro Frame
         self.dash_active = True
         self.dash_frames_left = 15
         self.dash_step = 12.5
@@ -107,65 +105,57 @@ class Player:
             self.dash_frames_left -= 1
             if self.dash_frames_left <= 0:
                 self.dash_active = False
-    # KI-Ende
 
-    # KI-Anfang
-    # KI: Microsoft Copilot
-    # prompt: wie kann ich die frames tauschen beim Laufen?
     def animate_walk(self):
         self.animation_timer += 1
         if self.animation_timer >= 10:
             self.animation_timer = 0
+            # cycle through walking frames (1..3)
             self.animation_index = (self.animation_index + 1) % 3 + 1
             self.image = self.frames[self.animation_index] if self.facing_right else self.frames_left[self.animation_index]
-    # KI-Ende
 
-    # KI-Anfang
-    # KI: Microsoft Copilot
-    # prompt: wie erstelle ich Schwerkraft?
     def physics(self, ground):
-        # Bewegung anwenden
+        # gravity
         self.dy += 1
-        self.rect.x += self.dx
-        self.rect.y += self.dy
+        self.rect.x += int(self.dx)
+        self.rect.y += int(self.dy)
 
+        # dash movement
         self.do_dash()
 
-        # Top-Plattform Y (Weltkoordinate)
+        # Top platform Y (world coordinate)
         top_world_y = GameVariables.SCREEN_HEIGHT - 2 * GameVariables.SQUARE_SIZE
 
-        # Fuß-Indizes berechnen (links und rechts)
+        # Determine which ground indices are under player's feet
         left_index = self.rect.left // GameVariables.SQUARE_SIZE
         right_index = (self.rect.right - 1) // GameVariables.SQUARE_SIZE
 
-        # Prüfen, ob irgendein Fuß auf einem Block steht (sicherheitschecks für Indexbereich)
         supported = False
         n = len(ground)
-        if 0 <= left_index < n and ground[left_index]:
-            supported = True
-        if 0 <= right_index < n and ground[right_index]:
-            supported = True
+        # check all indices under player's width for robustness
+        for idx in range(left_index, right_index + 1):
+            if 0 <= idx < n and ground[idx]:
+                supported = True
+                break
 
         if self.rect.bottom >= top_world_y:
             if supported:
-                # Es gibt einen Block unter den Füßen -> aufsetzen
+                # snap to platform
                 self.rect.bottom = top_world_y
                 self.dy = 0
                 self.on_ground = True
             else:
-                # Kein Block unter den Füßen -> durchfallen
+                # fall through if no support
                 self.on_ground = False
-                # damit er nicht sofort wieder "snappt", gib ihm eine kleine positive Geschwindigkeit
                 if self.dy < 1:
                     self.dy = 1
         else:
             self.on_ground = False
-    # KI-Ende
 
     def draw_with_camera(self, camera_x, camera_y):
         now = pygame.time.get_ticks()
         if now < getattr(self, "invulnerable_until", 0):
-            # blink every 100 ms: draw only on alternating intervals
+            # blink every 100 ms
             if (now // 100) % 2 == 0:
                 self.screen.blit(self.image, (self.rect.x + camera_x, self.rect.y + camera_y))
         else:
