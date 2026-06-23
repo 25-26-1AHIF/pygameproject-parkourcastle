@@ -7,6 +7,11 @@ class GameVariables:
     SQUARE_SIZE = 64
     CLOSE_SIZE = 50
     FPS = 60
+    HAS_SHIELD = False
+    HAS_SPEED = False
+    HAS_DOUBLEJUMP = False
+    HAS_MULTIPLIER = False
+    HAS_EXTRA_LIFE = False
 
     PLAYER_NAME = ""
     SCORE = 0
@@ -35,4 +40,5 @@ class GameScreens:
     HIGHSCORES = "highscores"
     DEATH = "death"
     CREDITS = "credits"
+    SHOP = "shop"
     actual = MAIN

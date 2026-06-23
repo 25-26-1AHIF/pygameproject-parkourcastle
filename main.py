@@ -19,12 +19,14 @@ def main_screen(screen: pygame.Surface, clock: pygame.time.Clock) -> GameScreens
     controls_text = GameVariables.FONT_MIDDLE.render("STEUERUNG", True, "white")
     highscores_text = GameVariables.FONT_MIDDLE.render("BESTENLISTE", True, "white")
     credits_text = GameVariables.FONT_MIDDLE.render("CREDITS", True, "white")
+    shop_text = GameVariables.FONT_MIDDLE.render("SHOP", True, "white")
 
     titel_text_rect = titel_text.get_rect(center=(GameVariables.SCREEN_WIDTH / 2, 100))
     starten_text_rect = starten_text.get_rect(center=(GameVariables.SCREEN_WIDTH / 4, 250))
     highscores_text_rect = highscores_text.get_rect(center=(GameVariables.SCREEN_WIDTH / 4, 325))
     controls_text_rect = controls_text.get_rect(center=(GameVariables.SCREEN_WIDTH / 4, 400))
     credits_text_rect = credits_text.get_rect(center=(GameVariables.SCREEN_WIDTH / 4, 475))
+    shop_text_rect = shop_text.get_rect(center=(GameVariables.SCREEN_WIDTH / 4, 550))
 
     running = True
     while running:
@@ -50,6 +52,9 @@ def main_screen(screen: pygame.Surface, clock: pygame.time.Clock) -> GameScreens
                 elif credits_text_rect.collidepoint(event.pos):
                     print("Credits gedrückt!")
                     return GameScreens.CREDITS
+                elif shop_text_rect.collidepoint(event.pos):
+                    print("Shop gedrückt!")
+                    return GameScreens.SHOP
 
         screen.blit(BACKGROUND, (0, 0))
         screen.blit(source=titel_text, dest=titel_text_rect)
@@ -57,11 +62,13 @@ def main_screen(screen: pygame.Surface, clock: pygame.time.Clock) -> GameScreens
         screen.blit(source=controls_text, dest=controls_text_rect)
         screen.blit(source=highscores_text, dest=highscores_text_rect)
         screen.blit(source=credits_text, dest=credits_text_rect)
+        screen.blit(source=shop_text, dest=shop_text_rect)
 
         pygame.draw.rect(screen, (255, 0, 0), starten_text_rect, 1)
         pygame.draw.rect(screen, (255, 255, 0), controls_text_rect, 1)
         pygame.draw.rect(screen, (0, 255, 255), highscores_text_rect, 1)
         pygame.draw.rect(screen, (255, 0, 255), credits_text_rect, 1)
+        pygame.draw.rect(screen, (0, 0, 255), shop_text_rect, 1)
         pygame.display.flip()
         clock.tick(GameVariables.FPS)
     pygame.quit()
@@ -684,6 +691,87 @@ def respawn_player(player, ground, spikes, camera_setter=None, clear_radius=2, s
     # Rückgabe: aktualisierte spikes-Liste
     return spikes
 
+def shop_screen(screen, clock):
+    pygame.display.set_caption("Shop")
+
+    titel_text = GameVariables.FONT_BIG.render("Shop & Upgrades", True, "white")
+    titel_rect = titel_text.get_rect(center=(GameVariables.SCREEN_WIDTH / 2, 100))
+
+    items = [
+        ("Schild", 50, "HAS_SHIELD"),
+        ("Speed", 100, "HAS_SPEED"),
+        ("Double-Jump", 150, "HAS_DOUBLEJUMP"),
+        ("Multiplikator", 200, "HAS_MULTIPLIER"),
+        ("Extra-Leben", 250, "HAS_EXTRA_LIFE"),
+    ]
+
+    button_rects = []
+    y = 250
+    for name, preis, flag in items:
+        rect = pygame.Rect(GameVariables.SCREEN_WIDTH / 2 - 150, y, 300, 50)
+        button_rects.append((rect, name, preis, flag))
+        y += 75
+
+    # Feedback-Text
+    feedback_text = None
+    feedback_color = None
+    feedback_timer = 0
+
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                exit(0)
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                return GameScreens.EXIT
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                for rect, name, preis, flag in button_rects:
+                    if rect.collidepoint(event.pos):
+                        if getattr(GameVariables, flag, False):
+                            # Schon gekauft
+                            feedback_text = f"{name} bereits gekauft!"
+                            feedback_color = (200, 200, 200)  # grau
+                            feedback_timer = pygame.time.get_ticks()
+                        elif GameVariables.SCORE >= preis:
+                            GameVariables.SCORE -= preis
+                            setattr(GameVariables, flag, True)
+                            feedback_text = f"{name} gekauft!"
+                            feedback_color = (0, 200, 0)  # grün
+                            feedback_timer = pygame.time.get_ticks()
+                        else:
+                            feedback_text = "Nicht genug Punkte!"
+                            feedback_color = (200, 0, 0)  # rot
+                            feedback_timer = pygame.time.get_ticks()
+
+        # Hintergrund
+        screen.fill("black")
+        screen.blit(titel_text, titel_rect)
+
+        # Score anzeigen
+        score_text = GameVariables.FONT_MIDDLE.render(f"Score: {GameVariables.SCORE}", True, "yellow")
+        screen.blit(score_text, (50, 50))
+
+        # Buttons zeichnen
+        for rect, name, preis, flag in button_rects:
+            if getattr(GameVariables, flag, False):
+                pygame.draw.rect(screen, (128, 128, 128), rect, border_radius=10)  # grau
+                text = pygame.font.SysFont("bahnschrift", 24, bold=False).render(f"{name} - gekauft", True, "white")
+            else:
+                pygame.draw.rect(screen, (0, 255, 0), rect, border_radius=10)  # grün
+                text = pygame.font.SysFont("bahnschrift", 24, bold=False).render(f"{name} - {preis} Punkte", True, "black")
+
+            text_rect = text.get_rect(center=rect.center)
+            screen.blit(text, text_rect)
+
+        # Feedback anzeigen (für 1 Sekunde)
+        if feedback_text and pygame.time.get_ticks() - feedback_timer < 1000:
+            fb = GameVariables.FONT_MIDDLE.render(feedback_text, True, feedback_color)
+            fb_rect = fb.get_rect(center=(GameVariables.SCREEN_WIDTH / 2, GameVariables.SCREEN_HEIGHT - 75))
+            screen.blit(fb, fb_rect)
+
+        pygame.display.flip()
+        clock.tick(GameVariables.FPS)
+
 
 def main():
     GameVariables.init()
@@ -708,6 +796,8 @@ def main():
             GameScreens.actual = death_screen(screen, clock)
         elif GameScreens.actual == GameScreens.CREDITS:
             GameScreens.actual = credits_screen(screen, clock)
+        elif GameScreens.actual == GameScreens.SHOP:
+            GameScreens.actual = shop_screen(screen, clock)
 
 
 pygame.quit()

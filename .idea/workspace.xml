@@ -4,9 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ad0fc84f-e4dd-45ea-b1f9-0ac010cc5c26" name="Changes" comment="Sprungkraft von 15 auf 20 erhöht!&#10;&#10;&#10;&#10;Vincent Raven Schwindsackl - 23.06.2026 10:30:50 Uhr">
+    <list default="true" id="ad0fc84f-e4dd-45ea-b1f9-0ac010cc5c26" name="Changes" comment="Leichte Fixes!&#10;&#10;Vincent Raven Schwindsackl - 23.06.2026 11:04:30 Uhr">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/highscores.json" beforeDir="false" afterPath="$PROJECT_DIR$/highscores.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/game_variables/game_variables.py" beforeDir="false" afterPath="$PROJECT_DIR$/game_variables/game_variables.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/highscores.json" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -310,7 +311,15 @@
       <option name="project" value="LOCAL" />
       <updated>1782203449141</updated>
     </task>
-    <option name="localTasksCounter" value="27" />
+    <task id="LOCAL-00027" summary="Leichte Fixes!&#10;&#10;Vincent Raven Schwindsackl - 23.06.2026 11:04:30 Uhr">
+      <option name="closed" value="true" />
+      <created>1782205469006</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1782205469006</updated>
+    </task>
+    <option name="localTasksCounter" value="28" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -360,6 +369,7 @@
     <MESSAGE value="1. Respawn wurde gefixt. &#10;2. Ein 1s Spawnschutz wird aktiviert. Spieler &quot;blinkt&quot; als visuelles Anzeigen.&#10;&#10;Vincent Raven Schwindsackl, 16.06.2026 - 12:39:20" />
     <MESSAGE value="Spiel wurde von KI wieder gefixt!&#10;&#10;Vincent Raven Schwindsackl - 23.06.2026 10:27:35 Uhr" />
     <MESSAGE value="Sprungkraft von 15 auf 20 erhöht!&#10;&#10;&#10;&#10;Vincent Raven Schwindsackl - 23.06.2026 10:30:50 Uhr" />
-    <option name="LAST_COMMIT_MESSAGE" value="Sprungkraft von 15 auf 20 erhöht!&#10;&#10;&#10;&#10;Vincent Raven Schwindsackl - 23.06.2026 10:30:50 Uhr" />
+    <MESSAGE value="Leichte Fixes!&#10;&#10;Vincent Raven Schwindsackl - 23.06.2026 11:04:30 Uhr" />
+    <option name="LAST_COMMIT_MESSAGE" value="Leichte Fixes!&#10;&#10;Vincent Raven Schwindsackl - 23.06.2026 11:04:30 Uhr" />
   </component>
 </project>
