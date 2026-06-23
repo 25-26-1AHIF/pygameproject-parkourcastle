@@ -7,6 +7,7 @@ from Game.player import Player
 from game_variables.game_variables import GameVariables
 from game_variables.game_variables import GameScreens
 
+
 def main_screen(screen: pygame.Surface, clock: pygame.time.Clock) -> GameScreens:
     pygame.display.set_caption("Main Screen")
     BACKGROUND = pygame.image.load("sprites/background/Start_screen.png")
@@ -19,9 +20,9 @@ def main_screen(screen: pygame.Surface, clock: pygame.time.Clock) -> GameScreens
     highscores_text = GameVariables.FONT_MIDDLE.render("BESTENLISTE", True, "white")
     credits_text = GameVariables.FONT_MIDDLE.render("CREDITS", True, "white")
 
-    titel_text_rect = titel_text.get_rect(center=(GameVariables.SCREEN_WIDTH/2, 100))
-    starten_text_rect  = starten_text.get_rect(center=(GameVariables.SCREEN_WIDTH/4, 250))
-    highscores_text_rect = highscores_text.get_rect(center=(GameVariables.SCREEN_WIDTH/4, 325))
+    titel_text_rect = titel_text.get_rect(center=(GameVariables.SCREEN_WIDTH / 2, 100))
+    starten_text_rect = starten_text.get_rect(center=(GameVariables.SCREEN_WIDTH / 4, 250))
+    highscores_text_rect = highscores_text.get_rect(center=(GameVariables.SCREEN_WIDTH / 4, 325))
     controls_text_rect = controls_text.get_rect(center=(GameVariables.SCREEN_WIDTH / 4, 400))
     credits_text_rect = credits_text.get_rect(center=(GameVariables.SCREEN_WIDTH / 4, 475))
 
@@ -50,7 +51,6 @@ def main_screen(screen: pygame.Surface, clock: pygame.time.Clock) -> GameScreens
                     print("Credits gedrückt!")
                     return GameScreens.CREDITS
 
-
         screen.blit(BACKGROUND, (0, 0))
         screen.blit(source=titel_text, dest=titel_text_rect)
         screen.blit(source=starten_text, dest=starten_text_rect)
@@ -66,7 +66,9 @@ def main_screen(screen: pygame.Surface, clock: pygame.time.Clock) -> GameScreens
         clock.tick(GameVariables.FPS)
     pygame.quit()
 
+
 import random
+
 
 def generate_ground():
     ANZAHL_BLOECKE = 200
@@ -122,7 +124,7 @@ def play_screen(screen, clock):
             spikes.append(i)
 
     # ==========================================================================================
-    # GEMINI: Fix für den Prompt "fixe bitte in diesem code das die spikes in player spawnen können"
+    # COPILOT: Fix für den Prompt "fixe bitte in diesem code das die spikes in player spawnen können"
 
     spikes = clear_spikes_around(spikes, center=0, radius=3)
 
@@ -209,8 +211,12 @@ def play_screen(screen, clock):
                                      (spike_rect.x + camera_x, spike_rect.y + camera_y, spike_rect.width,
                                       spike_rect.height), 1)
 
+
         # Player updaten und zeichnen
         player.update_and_draw(camera_x, camera_y, ground)
+        pygame.draw.rect(screen, (0, 255, 0),
+                         (player.rect.x + camera_x, player.rect.y + camera_y, player.rect.width,
+                          player.rect.height), 1)
 
         # Spike-Kollision prüfen
         for spike in spike_rects:
@@ -220,16 +226,28 @@ def play_screen(screen, clock):
 
         pygame.display.flip()
         clock.tick(GameVariables.FPS)
+
     # Closure, die respawn_player die Kamera sofort setzen lässt
     def set_camera(x, y):
         nonlocal camera_x, camera_y
         camera_x = x
         camera_y = y
+    # --- Left wall (chaser) setup ---
+    # Start at world x = 0 (left edge of background/world)
+    wall_width = GameVariables.SCREEN_WIDTH // 3
+    wall_height = GameVariables.SCREEN_HEIGHT * 3
+    wall_x = GameVariables.SCREEN_WIDTH - GameVariables.SCREEN_WIDTH  # starts at the very left of the world/background
+    wall_y = 0
+    # Wall speed slightly slower than player max horizontal speed (player ~5 px/frame)
+    wall_speed = 2  # adjust 1-3 for difficulty
 
     # Sofort sicheren Spawn erzwingen (bereinigt spikes in Spawn-Umgebung)
     spikes = respawn_player(player, ground, spikes, set_camera, clear_radius=2, spike_clear_radius=2, invuln_ms=1500)
 
     running = True
+
+    # Precompute world length (end of background)
+    world_length = len(ground) * GameVariables.SQUARE_SIZE
 
     # Die Main Loop (Game Loop)
     while running:
@@ -252,7 +270,6 @@ def play_screen(screen, clock):
         if player.rect.top > GameVariables.SCREEN_HEIGHT:
             update_score(GameVariables.PLAYER_NAME, GameVariables.SCORE)
             return GameScreens.DEATH
-
 
         camera_x = -player.rect.x + GameVariables.SCREEN_WIDTH // 2
         camera_y = 0  # Kamera bleibt vertikal fixiert
@@ -315,9 +332,36 @@ def play_screen(screen, clock):
                     spike_rect = pygame.Rect(spike_world_x, draw_y, spike_img_w, spike_img_h)
                     spike_rects.append(spike_rect)
 
+                    # --- Update wall position (world coordinates) ---
+                    # Wall moves right at wall_speed each frame (so player can outrun it if faster)
+                    wall_x += wall_speed
+
+                    # Clamp wall to world end so it doesn't run past the level
+                    if wall_x + wall_width > world_length:
+                        wall_x = max(0, world_length - wall_width)
+
+                    # Draw wall in camera coordinates (solid black rectangle)
+                    wall_rect_world = pygame.Rect(wall_x, wall_y, wall_width, wall_height)
+                    pygame.draw.rect(screen, (0, 0, 0), (wall_rect_world.x + camera_x, wall_rect_world.y + camera_y,
+                                                         wall_rect_world.width, wall_rect_world.height))
+
+                    # If wall collides with player, push player to the right of the wall
+                    if wall_rect_world.colliderect(player.rect):
+                        # place player's left edge at wall's right edge (world coords)
+                        player.rect.left = wall_rect_world.right
+                        player.dx = 0
+                        # small extra push to avoid sticking
+                        player.rect.x += 2
 
         # Player updaten und zeichnen (player.rect bleibt in Weltkoordinaten)
         player.update_and_draw(camera_x, camera_y, ground)
+        # Debug: Spieler-Hitbox in Grün zeichnen (1px Rahmen)
+        pygame.draw.rect(
+            screen,
+            (0, 255, 0),
+            (player.rect.x + camera_x, player.rect.y + camera_y, player.rect.width, player.rect.height),
+            1
+        )
         # Spike-Kollision prüfen (Weltkoordinaten)
         now = pygame.time.get_ticks()
         for spike in spike_rects:
@@ -330,6 +374,7 @@ def play_screen(screen, clock):
         clock.tick(GameVariables.FPS)
     pygame.quit()
 
+
 def controls_screen(screen, clock):
     BACKGROUND = pygame.image.load("sprites/background/bricks-background.png")
     BACKGROUND = pygame.transform.scale(BACKGROUND, (GameVariables.SCREEN_WIDTH, GameVariables.SCREEN_HEIGHT))
@@ -341,21 +386,20 @@ def controls_screen(screen, clock):
     sprung_dash_text = GameVariables.FONT_MIDDLE.render("Leertaste+W - Sprungdash", True, "white")
     links_dash_text = GameVariables.FONT_MIDDLE.render("Leertaste+A - Linksdash", True, "white")
     rechts_dash_text = GameVariables.FONT_MIDDLE.render("Leertaste+D - Rechtsdash", True, "white")
-    dash_erklaert_text = GameVariables.FONT_SMALL.render("DASH: Boostet dich kurz in die jeweilige ausgewählte Richtung nach vorne!", True, "red")
+    dash_erklaert_text = GameVariables.FONT_SMALL.render(
+        "DASH: Boostet dich kurz in die jeweilige ausgewählte Richtung nach vorne!", True, "red")
     x_text = GameVariables.FONT_BIG.render("X", True, "white")
 
-    steuerung_text_rect = steuerung_text.get_rect(center=(GameVariables.SCREEN_WIDTH/2, 50))
-    springen_text_rect = springen_text.get_rect(center=(GameVariables.SCREEN_WIDTH/4, 200))
-    links_text_rect = links_text.get_rect(center=(GameVariables.SCREEN_WIDTH*0.75, 200))
-    rechts_text_rect = rechts_text.get_rect(center=(GameVariables.SCREEN_WIDTH/4, 300))
-    escape_text_rect = escape_text.get_rect(center=(GameVariables.SCREEN_WIDTH*0.75, 300))
-    links_dash_text_rect = links_dash_text.get_rect(center=(GameVariables.SCREEN_WIDTH/4, 400))
-    rechts_dash_text_rect = rechts_dash_text.get_rect(center=(GameVariables.SCREEN_WIDTH*0.75, 400))
-    sprung_dash_text_rect = sprung_dash_text.get_rect(center=(GameVariables.SCREEN_WIDTH/2, 500))
-    dash_erklaert_text_rect = dash_erklaert_text.get_rect(center=(GameVariables.SCREEN_WIDTH/2, 700))
+    steuerung_text_rect = steuerung_text.get_rect(center=(GameVariables.SCREEN_WIDTH / 2, 50))
+    springen_text_rect = springen_text.get_rect(center=(GameVariables.SCREEN_WIDTH / 4, 200))
+    links_text_rect = links_text.get_rect(center=(GameVariables.SCREEN_WIDTH * 0.75, 200))
+    rechts_text_rect = rechts_text.get_rect(center=(GameVariables.SCREEN_WIDTH / 4, 300))
+    escape_text_rect = escape_text.get_rect(center=(GameVariables.SCREEN_WIDTH * 0.75, 300))
+    links_dash_text_rect = links_dash_text.get_rect(center=(GameVariables.SCREEN_WIDTH / 4, 400))
+    rechts_dash_text_rect = rechts_dash_text.get_rect(center=(GameVariables.SCREEN_WIDTH * 0.75, 400))
+    sprung_dash_text_rect = sprung_dash_text.get_rect(center=(GameVariables.SCREEN_WIDTH / 2, 500))
+    dash_erklaert_text_rect = dash_erklaert_text.get_rect(center=(GameVariables.SCREEN_WIDTH / 2, 700))
     x_text_rect = x_text.get_rect(center=(924, 63))
-
-
 
     pygame.display.set_caption("Controls Screen")
     running = True
@@ -389,6 +433,7 @@ def controls_screen(screen, clock):
         pygame.display.flip()
         clock.tick(GameVariables.FPS)
     pygame.quit()
+
 
 def name_input_screen(screen, clock):
     pygame.display.set_caption("Name eingeben")
@@ -426,15 +471,16 @@ def name_input_screen(screen, clock):
 def highscore_screen(screen, clock):
     pygame.display.set_caption("Highscores")
 
-
     scores = load_scores()
     sorted_scores = sorted(scores.items(), key=lambda x: x[1], reverse=True)
     x_text = GameVariables.FONT_BIG.render("X", True, "white")
     x_text_rect = x_text.get_rect(center=(924, 63))
     titel_text = GameVariables.FONT_BIG.render("Bestenliste", True, "white")
-    keine_spieler_text = pygame.font.SysFont("bahnschrift", 80, bold=True).render("! Keine Spieler gefunden !", True, "red")
-    keine_spieler_text_rect = keine_spieler_text.get_rect(center=(GameVariables.SCREEN_WIDTH/2, GameVariables.SCREEN_HEIGHT/2))
-    titel_text_rect = titel_text.get_rect(center=(GameVariables.SCREEN_WIDTH/2, 100))
+    keine_spieler_text = pygame.font.SysFont("bahnschrift", 80, bold=True).render("! Keine Spieler gefunden !", True,
+                                                                                  "red")
+    keine_spieler_text_rect = keine_spieler_text.get_rect(
+        center=(GameVariables.SCREEN_WIDTH / 2, GameVariables.SCREEN_HEIGHT / 2))
+    titel_text_rect = titel_text.get_rect(center=(GameVariables.SCREEN_WIDTH / 2, 100))
 
     running = True
     while running:
@@ -482,13 +528,15 @@ def highscore_screen(screen, clock):
         pygame.display.flip()
         clock.tick(60)
 
+
 def death_screen(screen, clock):
     pygame.display.set_caption("Death")
 
     tod_text = pygame.font.SysFont("bahnschrift", 80, bold=True).render("Du bist gestorben...", True, "red")
-    tod_text_rect = tod_text.get_rect(center=(GameVariables.SCREEN_WIDTH/2, GameVariables.SCREEN_HEIGHT/2))
+    tod_text_rect = tod_text.get_rect(center=(GameVariables.SCREEN_WIDTH / 2, GameVariables.SCREEN_HEIGHT / 2))
     hauptmenu_text = GameVariables.FONT_MIDDLE.render("Hauptmenü", True, "white")
-    hauptmenu_text_rect = hauptmenu_text.get_rect(center=(GameVariables.SCREEN_WIDTH/2, GameVariables.SCREEN_HEIGHT/2 + 100))
+    hauptmenu_text_rect = hauptmenu_text.get_rect(
+        center=(GameVariables.SCREEN_WIDTH / 2, GameVariables.SCREEN_HEIGHT / 2 + 100))
     screen.fill("black")
     pygame.draw.rect(screen, "brown", hauptmenu_text_rect, border_radius=10)
     screen.blit(source=tod_text, dest=tod_text_rect)
@@ -509,6 +557,7 @@ def death_screen(screen, clock):
         pygame.display.flip()
         clock.tick(60)
 
+
 def credits_screen(screen, clock):
     pygame.display.set_caption("Credits")
 
@@ -516,25 +565,26 @@ def credits_screen(screen, clock):
     BACKGROUND = pygame.transform.scale(BACKGROUND, (GameVariables.SCREEN_WIDTH, GameVariables.SCREEN_HEIGHT))
 
     titel_text = GameVariables.FONT_BIG.render("Credits", True, "white")
-    titel_rect = titel_text.get_rect(center=(GameVariables.SCREEN_WIDTH/2, 100))
+    titel_rect = titel_text.get_rect(center=(GameVariables.SCREEN_WIDTH / 2, 100))
 
     # Beispiel-Credits
     dev_text = GameVariables.FONT_MIDDLE.render("Entwickler: Vincent Raven Schwindsackl und Levin Hagen", True, "gold")
-    dev_rect = dev_text.get_rect(center=(GameVariables.SCREEN_WIDTH/2, 250))
+    dev_rect = dev_text.get_rect(center=(GameVariables.SCREEN_WIDTH / 2, 250))
 
     art_text = GameVariables.FONT_MIDDLE.render("Grafiken: Levin Hagen - Eigene Assets", True, "white")
-    art_rect = art_text.get_rect(center=(GameVariables.SCREEN_WIDTH/2, 325))
+    art_rect = art_text.get_rect(center=(GameVariables.SCREEN_WIDTH / 2, 325))
 
     music_text = GameVariables.FONT_MIDDLE.render("Musik/SFX: Levin Hagen - Eigene Sounds", True, "white")
-    music_rect = music_text.get_rect(center=(GameVariables.SCREEN_WIDTH/2, 400))
+    music_rect = music_text.get_rect(center=(GameVariables.SCREEN_WIDTH / 2, 400))
 
-    first_thanks_text = GameVariables.FONT_MIDDLE.render("Spezielles Dankeschön an: Die Lehrer für das beibringen", True, "white")
+    first_thanks_text = GameVariables.FONT_MIDDLE.render("Spezielles Dankeschön an: Die Lehrer für das beibringen",
+                                                         True, "white")
     second_thanks_text = GameVariables.FONT_MIDDLE.render("Levin Hagen für die Sounds und Grafiken und", True, "white")
     third_thanks_text = GameVariables.FONT_MIDDLE.render("Vincent Raven Schwindsackl für den Code!", True, "white")
 
-    first_thanks_rect = first_thanks_text.get_rect(center=(GameVariables.SCREEN_WIDTH/2, 475))
-    second_thanks_rect = second_thanks_text.get_rect(center=(GameVariables.SCREEN_WIDTH/2, 525))
-    third_thanks_rect = third_thanks_text.get_rect(center=(GameVariables.SCREEN_WIDTH/2, 575))
+    first_thanks_rect = first_thanks_text.get_rect(center=(GameVariables.SCREEN_WIDTH / 2, 475))
+    second_thanks_rect = second_thanks_text.get_rect(center=(GameVariables.SCREEN_WIDTH / 2, 525))
+    third_thanks_rect = third_thanks_text.get_rect(center=(GameVariables.SCREEN_WIDTH / 2, 575))
 
     x_text = GameVariables.FONT_BIG.render("X", True, "white")
     x_rect = x_text.get_rect(center=(924, 63))
@@ -567,27 +617,31 @@ def credits_screen(screen, clock):
         pygame.display.flip()
         clock.tick(GameVariables.FPS)
 
+
 import random
 import pygame
+
 
 def find_safe_spawn_index(ground, spikes, clear_radius=2, tries=200):
     n = len(ground)
     for _ in range(tries):
         i = random.randrange(n)
         left = max(0, i - clear_radius)
-        right = min(n-1, i + clear_radius)
-        if all(ground[left:right+1]) and i not in spikes:
+        right = min(n - 1, i + clear_radius)
+        if all(ground[left:right + 1]) and i not in spikes:
             return i
     # Fallback: lineare Suche
     for i in range(n):
         left = max(0, i - clear_radius)
-        right = min(n-1, i + clear_radius)
-        if all(ground[left:right+1]) and i not in spikes:
+        right = min(n - 1, i + clear_radius)
+        if all(ground[left:right + 1]) and i not in spikes:
             return i
     return None
 
+
 def clear_spikes_around(spikes, center, radius=2):
     return [s for s in spikes if abs(s - center) > radius]
+
 
 def respawn_player(player, ground, spikes, camera_setter=None, clear_radius=2, spike_clear_radius=2, invuln_ms=1000):
     # finde sicheren Index
@@ -630,6 +684,7 @@ def respawn_player(player, ground, spikes, camera_setter=None, clear_radius=2, s
     # Rückgabe: aktualisierte spikes-Liste
     return spikes
 
+
 def main():
     GameVariables.init()
     screen = pygame.display.set_mode((GameVariables.SCREEN_WIDTH, GameVariables.SCREEN_HEIGHT))
@@ -654,8 +709,8 @@ def main():
         elif GameScreens.actual == GameScreens.CREDITS:
             GameScreens.actual = credits_screen(screen, clock)
 
-pygame.quit()
 
+pygame.quit()
 
 if __name__ == '__main__':
     # pygame und fonts initialisieren
