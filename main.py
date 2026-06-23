@@ -54,7 +54,7 @@ def main_screen(screen: pygame.Surface, clock: pygame.time.Clock) -> GameScreens
                     return GameScreens.CREDITS
                 elif shop_text_rect.collidepoint(event.pos):
                     print("Shop gedrückt!")
-                    return GameScreens.SHOP
+                    return GameScreens.NAME_INPUT_SHOP
 
         screen.blit(BACKGROUND, (0, 0))
         screen.blit(source=titel_text, dest=titel_text_rect)
@@ -691,6 +691,7 @@ def respawn_player(player, ground, spikes, camera_setter=None, clear_radius=2, s
     # Rückgabe: aktualisierte spikes-Liste
     return spikes
 
+
 def shop_screen(screen, clock):
     pygame.display.set_caption("Shop")
 
@@ -712,7 +713,6 @@ def shop_screen(screen, clock):
         button_rects.append((rect, name, preis, flag))
         y += 75
 
-    # Feedback-Text
     feedback_text = None
     feedback_color = None
     feedback_timer = 0
@@ -723,50 +723,48 @@ def shop_screen(screen, clock):
             if event.type == pygame.QUIT:
                 exit(0)
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                # Score nach Shop speichern
+                update_score(GameVariables.PLAYER_NAME, GameVariables.SCORE)
                 return GameScreens.EXIT
             if event.type == pygame.MOUSEBUTTONDOWN:
                 for rect, name, preis, flag in button_rects:
                     if rect.collidepoint(event.pos):
                         if getattr(GameVariables, flag, False):
-                            # Schon gekauft
                             feedback_text = f"{name} bereits gekauft!"
-                            feedback_color = (200, 200, 200)  # grau
+                            feedback_color = (200, 200, 200)
                             feedback_timer = pygame.time.get_ticks()
                         elif GameVariables.SCORE >= preis:
                             GameVariables.SCORE -= preis
                             setattr(GameVariables, flag, True)
                             feedback_text = f"{name} gekauft!"
-                            feedback_color = (0, 200, 0)  # grün
+                            feedback_color = (0, 200, 0)
                             feedback_timer = pygame.time.get_ticks()
                         else:
                             feedback_text = "Nicht genug Punkte!"
-                            feedback_color = (200, 0, 0)  # rot
+                            feedback_color = (200, 0, 0)
                             feedback_timer = pygame.time.get_ticks()
 
-        # Hintergrund
         screen.fill("black")
         screen.blit(titel_text, titel_rect)
 
-        # Score anzeigen
-        score_text = GameVariables.FONT_MIDDLE.render(f"Score: {GameVariables.SCORE}", True, "yellow")
+        score_text = GameVariables.FONT_MIDDLE.render(
+            f"Score: {GameVariables.SCORE}", True, "yellow"
+        )
         screen.blit(score_text, (50, 50))
 
-        # Buttons zeichnen
         for rect, name, preis, flag in button_rects:
             if getattr(GameVariables, flag, False):
-                pygame.draw.rect(screen, (128, 128, 128), rect, border_radius=10)  # grau
-                text = pygame.font.SysFont("bahnschrift", 24, bold=False).render(f"{name} - gekauft", True, "white")
+                pygame.draw.rect(screen, (128, 128, 128), rect, border_radius=10)
+                text = GameVariables.FONT_MIDDLE.render(f"{name} - gekauft", True, "white")
             else:
-                pygame.draw.rect(screen, (0, 255, 0), rect, border_radius=10)  # grün
-                text = pygame.font.SysFont("bahnschrift", 24, bold=False).render(f"{name} - {preis} Punkte", True, "black")
-
+                pygame.draw.rect(screen, (0, 255, 0), rect, border_radius=10)
+                text = GameVariables.FONT_MIDDLE.render(f"{name} - {preis} Punkte", True, "black")
             text_rect = text.get_rect(center=rect.center)
             screen.blit(text, text_rect)
 
-        # Feedback anzeigen (für 1 Sekunde)
         if feedback_text and pygame.time.get_ticks() - feedback_timer < 1000:
             fb = GameVariables.FONT_MIDDLE.render(feedback_text, True, feedback_color)
-            fb_rect = fb.get_rect(center=(GameVariables.SCREEN_WIDTH / 2, GameVariables.SCREEN_HEIGHT - 75))
+            fb_rect = fb.get_rect(center=(GameVariables.SCREEN_WIDTH / 2, GameVariables.SCREEN_HEIGHT - 100))
             screen.blit(fb, fb_rect)
 
         pygame.display.flip()
@@ -796,8 +794,17 @@ def main():
             GameScreens.actual = death_screen(screen, clock)
         elif GameScreens.actual == GameScreens.CREDITS:
             GameScreens.actual = credits_screen(screen, clock)
-        elif GameScreens.actual == GameScreens.SHOP:
-            GameScreens.actual = shop_screen(screen, clock)
+        elif GameScreens.actual == GameScreens.NAME_INPUT_SHOP:
+            result = name_input_screen(screen, clock)
+            if result == GameScreens.PLAY:
+                scores = load_scores()
+                if GameVariables.PLAYER_NAME in scores:
+                    GameVariables.SCORE = scores[GameVariables.PLAYER_NAME]
+                else:
+                    GameVariables.SCORE = 0
+                GameScreens.actual = shop_screen(screen, clock)
+            else:
+                GameScreens.actual = result
 
 
 pygame.quit()

@@ -4,10 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ad0fc84f-e4dd-45ea-b1f9-0ac010cc5c26" name="Changes" comment="Leichte Fixes!&#10;&#10;Vincent Raven Schwindsackl - 23.06.2026 11:04:30 Uhr">
+    <list default="true" id="ad0fc84f-e4dd-45ea-b1f9-0ac010cc5c26" name="Changes" comment="Shop &amp; Upgrades hinzugefügt!&#10;&#10;Vincent Raven Schwindsackl - 23.06.2026 12:46:30 Uhr">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/game_variables/game_variables.py" beforeDir="false" afterPath="$PROJECT_DIR$/game_variables/game_variables.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/highscores.json" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -319,7 +318,15 @@
       <option name="project" value="LOCAL" />
       <updated>1782205469006</updated>
     </task>
-    <option name="localTasksCounter" value="28" />
+    <task id="LOCAL-00028" summary="Shop &amp; Upgrades hinzugefügt!&#10;&#10;Vincent Raven Schwindsackl - 23.06.2026 12:46:30 Uhr">
+      <option name="closed" value="true" />
+      <created>1782211584550</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1782211584550</updated>
+    </task>
+    <option name="localTasksCounter" value="29" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -370,6 +377,7 @@
     <MESSAGE value="Spiel wurde von KI wieder gefixt!&#10;&#10;Vincent Raven Schwindsackl - 23.06.2026 10:27:35 Uhr" />
     <MESSAGE value="Sprungkraft von 15 auf 20 erhöht!&#10;&#10;&#10;&#10;Vincent Raven Schwindsackl - 23.06.2026 10:30:50 Uhr" />
     <MESSAGE value="Leichte Fixes!&#10;&#10;Vincent Raven Schwindsackl - 23.06.2026 11:04:30 Uhr" />
-    <option name="LAST_COMMIT_MESSAGE" value="Leichte Fixes!&#10;&#10;Vincent Raven Schwindsackl - 23.06.2026 11:04:30 Uhr" />
+    <MESSAGE value="Shop &amp; Upgrades hinzugefügt!&#10;&#10;Vincent Raven Schwindsackl - 23.06.2026 12:46:30 Uhr" />
+    <option name="LAST_COMMIT_MESSAGE" value="Shop &amp; Upgrades hinzugefügt!&#10;&#10;Vincent Raven Schwindsackl - 23.06.2026 12:46:30 Uhr" />
   </component>
 </project>

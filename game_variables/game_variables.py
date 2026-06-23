@@ -37,6 +37,7 @@ class GameScreens:
     CONTROLS = "controls"
     EXIT = "exit"
     NAME_INPUT = "name_input"
+    NAME_INPUT_SHOP = "name_input_shop"
     HIGHSCORES = "highscores"
     DEATH = "death"
     CREDITS = "credits"
