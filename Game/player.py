@@ -61,7 +61,7 @@ class Player:
 
         # Jump
         if keys[pygame.K_w] and self.on_ground:
-            self.dy = -15
+            self.dy = -20
             self.on_ground = False
 
         # Dash input handling (space)
