@@ -606,25 +606,22 @@ def highscore_screen(screen, clock):
             screen.blit(source=keine_spieler_text, dest=keine_spieler_text_rect)
         y = 150
         for idx, (name, entry) in enumerate(sorted_scores):
-            # Falls alter Eintrag nur Zahl ist
             score_value = entry if isinstance(entry, int) else entry.get("score", 0)
+            if score_value == float("inf"):
+                score_str = "INFINITE"
+            else:
+                score_str = f"{score_value}s"
 
             if idx == 0:
-                text = GameVariables.FONT_MIDDLE.render(f"1. {name} - {score_value}s", True, "gold")
-                screen.blit(text, (100, y))
-                y += 75
+                text = GameVariables.FONT_MIDDLE.render(f"1. {name} - {score_str}", True, "gold")
             elif idx == 1:
-                text = GameVariables.FONT_MIDDLE.render(f"2. {name} - {score_value}s", True, "silver")
-                screen.blit(text, (100, y))
-                y += 75
+                text = GameVariables.FONT_MIDDLE.render(f"2. {name} - {score_str}", True, "silver")
             elif idx == 2:
-                text = GameVariables.FONT_MIDDLE.render(f"3. {name} - {score_value}s", True, "brown")
-                screen.blit(text, (100, y))
-                y += 75
+                text = GameVariables.FONT_MIDDLE.render(f"3. {name} - {score_str}", True, "brown")
             else:
-                text = GameVariables.FONT_MIDDLE.render(f"{idx + 1}. {name} - {score_value}s", True, "white")
-                screen.blit(text, (100, y))
-                y += 75
+                text = GameVariables.FONT_MIDDLE.render(f"{idx + 1}. {name} - {score_str}", True, "white")
+            screen.blit(text, (100, y))
+            y += 75
 
         pygame.display.flip()
         clock.tick(60)
@@ -888,22 +885,22 @@ def shop_screen(screen, clock):
 
 def admin_panel_screen(screen, clock):
     pygame.display.set_caption("Admin-Panel")
-    running = True
+
+    scores = load_scores()
     input_name = ""
     input_score = ""
-    scores = load_scores()
-    focus = 0  # 0 = Spieler, 1 = Score
-
-    # Feedback
+    focus = 0  # 0 = Name, 1 = Score
     feedback_text = ""
-    feedback_color = None
+    feedback_color = (0, 200, 0)
     feedback_until = 0
 
+    running = True
     while running:
         now = pygame.time.get_ticks()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit(); exit(0)
+
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     return GameScreens.EXIT
@@ -915,63 +912,63 @@ def admin_panel_screen(screen, clock):
                     elif focus == 0 and input_name:
                         input_name = input_name[:-1]
                 elif event.key == pygame.K_RETURN:
-                    try:
-                        if input_name in scores:
-                            new_score = int(input_score)
-                            scores[input_name]["score"] = new_score
+                    if input_name in scores:
+                        try:
+                            if input_score.strip().lower() == "inf":
+                                scores[input_name]["score"] = float("inf")
+                            else:
+                                new_score = int(input_score)
+                                scores[input_name]["score"] = new_score
                             save_scores(scores)
-                            feedback_text = "Gespeichert"
-                            feedback_color = (0, 200, 0)  # grün
+                            feedback_text = "Gespeichert!"
+                            feedback_color = (0, 200, 0)
                             feedback_until = now + 2000
-                        else:
-                            feedback_text = f"Fehler: Spieler '{input_name}' nicht gefunden"
-                            feedback_color = (200, 0, 0)  # rot
+                        except ValueError:
+                            feedback_text = "Fehler: Score muss Zahl sein oder 'inf'!"
+                            feedback_color = (200, 0, 0)
                             feedback_until = now + 4000
-                    except ValueError:
-                        feedback_text = "Fehler: Score muss Zahl sein"
+                    else:
+                        feedback_text = "Fehler: Spieler nicht in Bestenliste!"
                         feedback_color = (200, 0, 0)
                         feedback_until = now + 4000
+                    input_name, input_score = "", ""
                 else:
-                    if focus == 1 and event.unicode.isdigit():
-                        input_score += event.unicode
+                    if focus == 1:
+                        input_score += event.unicode   # Score-Feld: Zahlen UND Buchstaben
                     elif focus == 0:
-                        input_name += event.unicode
+                        input_name += event.unicode    # Name-Feld: alles erlaubt
 
         # Hintergrund
         screen.fill("yellow")
         title = GameVariables.FONT_BIG.render("Admin-Panel", True, "black")
-        screen.blit(title, (GameVariables.SCREEN_WIDTH//2 - 150, 50))
+        screen.blit(title, (GameVariables.SCREEN_WIDTH // 2 - 150, 50))
 
-        # Textfelder mit Rand
-        name_rect = pygame.Rect(100, 200, 400, 40)
-        score_rect = pygame.Rect(100, 260, 400, 40)
-        pygame.draw.rect(screen, (0,0,0), name_rect, 2 if focus == 0 else 1)
-        pygame.draw.rect(screen, (0,0,0), score_rect, 2 if focus == 1 else 1)
+        # Labels links
+        name_label = GameVariables.FONT_MIDDLE.render("Spieler:", True, "black")
+        score_label = GameVariables.FONT_MIDDLE.render("Neuer Score:", True, "black")
+        screen.blit(name_label, (100, 200))
+        screen.blit(score_label, (100, 300))
 
-        # Texte
-        name_txt = GameVariables.FONT_MIDDLE.render("Spieler: " + input_name, True, "black")
-        score_txt = GameVariables.FONT_MIDDLE.render("Neuer Score: " + input_score, True, "black")
-        screen.blit(name_txt, (name_rect.x+5, name_rect.y+5))
-        screen.blit(score_txt, (score_rect.x+5, score_rect.y+5))
+        # Eingabefelder mit orange Rahmen
+        name_rect = pygame.Rect(280, 190, 400, 40)
+        score_rect = pygame.Rect(280, 290, 400, 40)
+        pygame.draw.rect(screen, (255, 165, 0), name_rect, 2)   # orange Rahmen
+        pygame.draw.rect(screen, (255, 165, 0), score_rect, 2)
 
-        # Caret (blinkender Strich)
-        caret_height = GameVariables.FONT_MIDDLE.get_height()
-        if focus == 0:
-            caret_x = name_rect.x + 5 + GameVariables.FONT_MIDDLE.size("Spieler: " + input_name)[0]
-            caret_y = name_rect.y + 5
-        else:
-            caret_x = score_rect.x + 5 + GameVariables.FONT_MIDDLE.size("Neuer Score: " + input_score)[0]
-            caret_y = score_rect.y + 5
-        if (now // 500) % 2 == 0:
-            pygame.draw.line(screen, (0,0,0), (caret_x, caret_y), (caret_x, caret_y+caret_height), 2)
+        # Text + Cursor in die Boxen setzen
+        name_text = GameVariables.FONT_MIDDLE.render(input_name + ("|" if focus == 0 else ""), True, "black")
+        score_text = GameVariables.FONT_MIDDLE.render(input_score + ("|" if focus == 1 else ""), True, "black")
+        screen.blit(name_text, (name_rect.x + 10, name_rect.y + 5))
+        screen.blit(score_text, (score_rect.x + 10, score_rect.y + 5))
 
-        # Feedback anzeigen
+        # Feedback
         if feedback_text and now < feedback_until:
-            fb_txt = GameVariables.FONT_MIDDLE.render(feedback_text, True, feedback_color)
-            screen.blit(fb_txt, (100, 350))
+            fb = GameVariables.FONT_MIDDLE.render(feedback_text, True, feedback_color)
+            screen.blit(fb, (100, 400))
 
-        info_txt = GameVariables.FONT_SMALL.render("TAB = wechseln, Enter = speichern, ESC = schließen", True, "black")
-        screen.blit(info_txt, (100, 400))
+        # Hinweise unten
+        hint = GameVariables.FONT_SMALL.render("TAB = wechseln, Enter = speichern, ESC = schließen", True, "black")
+        screen.blit(hint, (100, 500))
 
         pygame.display.flip()
         clock.tick(GameVariables.FPS)

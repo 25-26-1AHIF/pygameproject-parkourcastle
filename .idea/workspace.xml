@@ -4,8 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ad0fc84f-e4dd-45ea-b1f9-0ac010cc5c26" name="Changes" comment="shield_icon.png bild fix&#10;&#10;Vincent Raven Schwindsackl - 26.06.2026 11:45:20 Uhr">
+    <list default="true" id="ad0fc84f-e4dd-45ea-b1f9-0ac010cc5c26" name="Changes" comment="Bestenliste-Fix&#10;&#10;Vincent Raven Schwindsackl - 26.06.2026 12:37:35 Uhr">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/highscores.json" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -352,7 +353,15 @@
       <option name="project" value="LOCAL" />
       <updated>1782467122989</updated>
     </task>
-    <option name="localTasksCounter" value="32" />
+    <task id="LOCAL-00032" summary="Bestenliste-Fix&#10;&#10;Vincent Raven Schwindsackl - 26.06.2026 12:37:35 Uhr">
+      <option name="closed" value="true" />
+      <created>1782470259166</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1782470259166</updated>
+    </task>
+    <option name="localTasksCounter" value="33" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -379,7 +388,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="gitignore für fehlerbehebung" />
     <MESSAGE value="bilder mir geben" />
     <MESSAGE value="Player funktioniert. Kann jetzt laufen und springen inklusive Animationen" />
     <MESSAGE value="Cooldown für Dash. Noch NICHT fertig!" />
@@ -404,6 +412,7 @@
     <MESSAGE value="Shop &amp; Upgrades hinzugefügt!&#10;1. Score verknüpft mit Shop, sonst erstmal nix.&#10;&#10;Vincent Raven Schwindsackl - 23.06.2026 12:57:55 Uhr" />
     <MESSAGE value="Shop endgültig fertig. ADMIN-PANEL hinzugefügt. man kann bestimmten spieler eine menge an scores geben. 5 neue power ups&#10;&#10;Vincent Raven Schwindsackl - 26.06.2026 11:44:33 Uhr" />
     <MESSAGE value="shield_icon.png bild fix&#10;&#10;Vincent Raven Schwindsackl - 26.06.2026 11:45:20 Uhr" />
-    <option name="LAST_COMMIT_MESSAGE" value="shield_icon.png bild fix&#10;&#10;Vincent Raven Schwindsackl - 26.06.2026 11:45:20 Uhr" />
+    <MESSAGE value="Bestenliste-Fix&#10;&#10;Vincent Raven Schwindsackl - 26.06.2026 12:37:35 Uhr" />
+    <option name="LAST_COMMIT_MESSAGE" value="Bestenliste-Fix&#10;&#10;Vincent Raven Schwindsackl - 26.06.2026 12:37:35 Uhr" />
   </component>
 </project>

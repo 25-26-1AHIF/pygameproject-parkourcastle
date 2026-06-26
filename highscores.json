@@ -1,1 +1,1 @@
-{"Vincent": {"score": 17, "upgrades": {"HAS_SHIELD": true, "HAS_SPEED": false, "HAS_DOUBLEJUMP": false, "HAS_MULTIPLIER": false, "HAS_EXTRA_LIFE": false}}, "Levin": {"score": 3, "upgrades": {"HAS_SHIELD": false, "HAS_SPEED": false, "HAS_DOUBLEJUMP": false, "HAS_MULTIPLIER": false, "HAS_EXTRA_LIFE": false}}}
+{"Vincent": {"score": Infinity, "upgrades": {"HAS_SHIELD": true, "HAS_SPEED": true, "HAS_DOUBLEJUMP": true, "HAS_MULTIPLIER": true, "HAS_EXTRA_LIFE": true}}}
