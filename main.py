@@ -573,7 +573,7 @@ def name_input_screen(screen, clock):
 def highscore_screen(screen, clock):
     pygame.display.set_caption("Highscores")
     scores = load_scores()
-    sorted_scores = sorted(scores.items(), key=lambda x: x[1], reverse=True)
+    sorted_scores = sorted(scores.items(), key=lambda x: x[1] if isinstance(x[1], int) else x[1].get("score", 0), reverse=True)
     x_text = GameVariables.FONT_BIG.render("X", True, "white")
     x_text_rect = x_text.get_rect(center=(924, 63))
     titel_text = GameVariables.FONT_BIG.render("Bestenliste", True, "white")
