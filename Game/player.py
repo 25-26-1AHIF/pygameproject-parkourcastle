@@ -1,13 +1,10 @@
-# player.py
 import pygame
 from game_variables.game_variables import GameVariables
 
 class Player:
     def __init__(self, screen):
         self.screen = screen
-        # Load sprite sheet (4 frames assumed)
         sheet = pygame.image.load("sprites/player/walk_cycle.png").convert_alpha()
-        # scale to reasonable size (adjust if needed)
         sheet = pygame.transform.scale(sheet, (175, 75))
 
         frame_width = sheet.get_width() // 4
@@ -17,20 +14,16 @@ class Player:
         self.frames_left = [pygame.transform.flip(f, True, False) for f in self.frames]
 
         self.image = self.frames[0]
-        # initial rect; respawn will place player correctly
         self.rect = self.image.get_rect(topleft=(100, 600))
 
-        # Movement
         self.dx = 0
         self.dy = 0
         self.on_ground = False
         self.facing_right = True
 
-        # Animation
         self.animation_index = 0
         self.animation_timer = 0
 
-        # Dash
         self.can_dash = True
         self.dash_cooldown = 1000
         self.last_dash_time = 0
@@ -39,32 +32,37 @@ class Player:
         self.dash_frames_left = 0
         self.dash_step = 0
 
-        # Invulnerability and dash disable timers
         self.invulnerable_until = 0
         self.dash_disabled_until = 0
+
+        self.speed_multiplier = 1.0
+        self.can_doublejump = False
+        self.doublejump_used = False
 
     def move(self):
         keys = pygame.key.get_pressed()
 
-        # Left / Right
         if keys[pygame.K_a]:
-            self.dx = -5
+            self.dx = -5 * self.speed_multiplier
             self.facing_right = False
             self.animate_walk()
         elif keys[pygame.K_d]:
-            self.dx = 5
+            self.dx = 5 * self.speed_multiplier
             self.facing_right = True
             self.animate_walk()
         else:
             self.dx = 0
             self.image = self.frames[0] if self.facing_right else self.frames_left[0]
 
-        # Jump
-        if keys[pygame.K_w] and self.on_ground:
-            self.dy = -20
-            self.on_ground = False
+        if keys[pygame.K_w]:
+            if self.on_ground:
+                self.dy = -20
+                self.on_ground = False
+                self.doublejump_used = False
+            elif self.can_doublejump and not self.doublejump_used:
+                self.dy = -20
+                self.doublejump_used = True
 
-        # Dash input handling (space)
         now = pygame.time.get_ticks()
         if keys[pygame.K_SPACE]:
             if not self.space_was_pressed:
@@ -76,11 +74,9 @@ class Player:
         else:
             self.space_was_pressed = False
 
-        # Reactivate dash if cooldown passed
         if not self.can_dash and now - self.last_dash_time >= self.dash_cooldown:
             self.can_dash = True
 
-        # Reactivate dash if disabled by respawn invuln
         if getattr(self, "dash_disabled_until", 0) and now >= self.dash_disabled_until:
             self.can_dash = True
             self.dash_disabled_until = 0
@@ -110,29 +106,21 @@ class Player:
         self.animation_timer += 1
         if self.animation_timer >= 10:
             self.animation_timer = 0
-            # cycle through walking frames (1..3)
             self.animation_index = (self.animation_index + 1) % 3 + 1
             self.image = self.frames[self.animation_index] if self.facing_right else self.frames_left[self.animation_index]
 
     def physics(self, ground):
-        # gravity
         self.dy += 1
         self.rect.x += int(self.dx)
         self.rect.y += int(self.dy)
-
-        # dash movement
         self.do_dash()
 
-        # Top platform Y (world coordinate)
         top_world_y = GameVariables.SCREEN_HEIGHT - 2 * GameVariables.SQUARE_SIZE
-
-        # Determine which ground indices are under player's feet
         left_index = self.rect.left // GameVariables.SQUARE_SIZE
         right_index = (self.rect.right - 1) // GameVariables.SQUARE_SIZE
 
         supported = False
         n = len(ground)
-        # check all indices under player's width for robustness
         for idx in range(left_index, right_index + 1):
             if 0 <= idx < n and ground[idx]:
                 supported = True
@@ -140,12 +128,10 @@ class Player:
 
         if self.rect.bottom >= top_world_y:
             if supported:
-                # snap to platform
                 self.rect.bottom = top_world_y
                 self.dy = 0
                 self.on_ground = True
             else:
-                # fall through if no support
                 self.on_ground = False
                 if self.dy < 1:
                     self.dy = 1
@@ -154,8 +140,18 @@ class Player:
 
     def draw_with_camera(self, camera_x, camera_y):
         now = pygame.time.get_ticks()
+        # Schild aktiv → blauer Kreis
+        if GameVariables.HAS_SHIELD and now < GameVariables.SHIELD_ACTIVE_UNTIL:
+            pygame.draw.circle(
+                self.screen,
+                (0, 0, 255),
+                (self.rect.x + camera_x + self.rect.width // 2,
+                 self.rect.y + camera_y + self.rect.height // 2),
+                max(self.rect.width, self.rect.height),
+                3
+            )
+        # Blink-Effekt bei Invulnerability
         if now < getattr(self, "invulnerable_until", 0):
-            # blink every 100 ms
             if (now // 100) % 2 == 0:
                 self.screen.blit(self.image, (self.rect.x + camera_x, self.rect.y + camera_y))
         else:

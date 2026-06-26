@@ -37,6 +37,34 @@ def main_screen(screen: pygame.Surface, clock: pygame.time.Clock) -> GameScreens
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     return GameScreens.EXIT
+                if event.key == pygame.K_q:
+                    # Code-Eingabe bevor Admin-Panel
+                    code = ""
+                    entering = True
+                    while entering:
+                        for e in pygame.event.get():
+                            if e.type == pygame.QUIT:
+                                pygame.quit();
+                                exit(0)
+                            if e.type == pygame.KEYDOWN:
+                                if e.key == pygame.K_RETURN:
+                                    if code == "2684":
+                                        return GameScreens.ADMIN_PANEL
+                                    else:
+                                        entering = False
+                                elif e.key == pygame.K_ESCAPE:
+                                    entering = False
+                                elif e.key == pygame.K_BACKSPACE:
+                                    code = code[:-1]
+                                else:
+                                    if len(code) < 4 and e.unicode.isdigit():
+                                        code += e.unicode
+                        screen.fill("black")
+                        txt = GameVariables.FONT_BIG.render("Admin-Code: " + code, True, "yellow")
+                        screen.blit(txt, (200, 300))
+                        pygame.display.flip()
+                        clock.tick(30)
+
             if event.type == pygame.MOUSEBUTTONDOWN:
                 # klickposition event.pos (x, y)
                 if starten_text_rect.collidepoint(event.pos):
@@ -122,20 +150,17 @@ def play_screen(screen, clock):
     spike_img = pygame.transform.scale(spike_img, (GameVariables.SQUARE_SIZE, GameVariables.SQUARE_SIZE))
 
     player = Player(screen)
+
+    # Powerups nur wenn gekauft
+    if GameVariables.HAS_SPEED:
+        player.speed_multiplier = 1.5
+    if GameVariables.HAS_DOUBLEJUMP:
+        player.can_doublejump = True
+
     ground = generate_ground()
-
-    # Spikes überall auf der Map generieren
-    spikes = []
-    for i, block in enumerate(ground):
-        if block and random.random() < 0.1:  # 10% Chance für Spike
-            spikes.append(i)
-
-    # ==========================================================================================
-    # COPILOT: Fix für den Prompt "fixe bitte in diesem code das die spikes in player spawnen können"
-
+    spikes = [i for i, block in enumerate(ground) if block and random.random() < 0.1]
     spikes = clear_spikes_around(spikes, center=0, radius=3)
 
-    # Spieler standardmäßig auf den ersten Block setzen
     player.rect.x = 0
     player.rect.bottom = GameVariables.SCREEN_HEIGHT - 2 * GameVariables.SQUARE_SIZE
     player.dx = 0
@@ -144,21 +169,33 @@ def play_screen(screen, clock):
 
     running = True
     while running:
-        if pygame.time.get_ticks() - score_timer >= 1000:
-            GameVariables.SCORE += 1
-            score_timer = pygame.time.get_ticks()
+        now = pygame.time.get_ticks()
+
+        # Score mit Multiplikator
+        if now - score_timer >= 1000:
+            if player.dx > 0:
+                GameVariables.SCORE += 2 if GameVariables.HAS_MULTIPLIER else 1
+            score_timer = now
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit()
-                exit(0)
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    update_score(GameVariables.PLAYER_NAME, GameVariables.SCORE)
-                    print("Escape gedrückt!")
-                    return GameScreens.EXIT
+                pygame.quit(); exit(0)
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                update_score(GameVariables.PLAYER_NAME, GameVariables.SCORE)
+                return GameScreens.EXIT
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and GameVariables.HAS_SHIELD:
+                icon_rect = pygame.Rect(GameVariables.SCREEN_WIDTH - 80, GameVariables.SCREEN_HEIGHT - 80, 64, 64)
+                if icon_rect.collidepoint(event.pos):
+                    if now >= GameVariables.SHIELD_LAST_USED + GameVariables.SHIELD_COOLDOWN:
+                        GameVariables.SHIELD_LAST_USED = now
+                        GameVariables.SHIELD_ACTIVE_UNTIL = now + GameVariables.SHIELD_DURATION
+                        player.invulnerable_until = GameVariables.SHIELD_ACTIVE_UNTIL
 
+        # Tod durch Fallen
         if player.rect.top > GameVariables.SCREEN_HEIGHT:
+            # Reset Schild-Cooldown beim Tod
+            GameVariables.SHIELD_LAST_USED = 0
+            GameVariables.SHIELD_ACTIVE_UNTIL = 0
             update_score(GameVariables.PLAYER_NAME, GameVariables.SCORE)
             return GameScreens.DEATH
 
@@ -221,6 +258,15 @@ def play_screen(screen, clock):
 
         # Player updaten und zeichnen
         player.update_and_draw(camera_x, camera_y, ground)
+        if now < GameVariables.SHIELD_ACTIVE_UNTIL:
+            pygame.draw.circle(
+                screen,
+                (0, 0, 255),
+                (player.rect.x + camera_x + player.rect.width // 2,
+                 player.rect.y + camera_y + player.rect.height // 2),
+                max(player.rect.width, player.rect.height),
+                3
+            )
         pygame.draw.rect(screen, (0, 255, 0),
                          (player.rect.x + camera_x, player.rect.y + camera_y, player.rect.width,
                           player.rect.height), 1)
@@ -228,8 +274,57 @@ def play_screen(screen, clock):
         # Spike-Kollision prüfen
         for spike in spike_rects:
             if player.rect.colliderect(spike):
-                update_score(GameVariables.PLAYER_NAME, GameVariables.SCORE)
-                return GameScreens.DEATH
+                if GameVariables.HAS_SHIELD and now < GameVariables.SHIELD_ACTIVE_UNTIL:
+                    # Schild aktiv → ignorieren
+                    continue
+                elif GameVariables.HAS_EXTRA_LIFE:
+                    GameVariables.HAS_EXTRA_LIFE = False
+                    player.invulnerable_until = now + 2000
+                    player.rect.x = 0
+                    player.rect.y = GameVariables.SCREEN_HEIGHT - 3 * GameVariables.SQUARE_SIZE
+                else:
+                    # Reset Schild-Cooldown beim Tod
+                    GameVariables.SHIELD_LAST_USED = 0
+                    GameVariables.SHIELD_ACTIVE_UNTIL = 0
+                    update_score(GameVariables.PLAYER_NAME, GameVariables.SCORE)
+                    return GameScreens.DEATH
+
+        # Schild-Icon zeichnen nur, wenn gekauft
+        if GameVariables.HAS_SHIELD:
+            icon_x, icon_y = GameVariables.SCREEN_WIDTH - 80, GameVariables.SCREEN_HEIGHT - 80
+            cooldown_remaining = max(0, (
+                        GameVariables.SHIELD_LAST_USED + GameVariables.SHIELD_COOLDOWN - now) // 1000)
+            icon = GameVariables.SHIELD_ICON.copy()
+            icon.set_alpha(100 if cooldown_remaining > 0 else 255)
+            screen.blit(icon, (icon_x, icon_y))
+            if cooldown_remaining > 0:
+                cd_text = GameVariables.FONT_SMALL.render(str(cooldown_remaining), True, "white")
+                screen.blit(cd_text, (icon_x + 20, icon_y - 20))
+            if now < GameVariables.SHIELD_ACTIVE_UNTIL:
+                pygame.draw.circle(screen, (0, 0, 255),
+                                   (player.rect.x + camera_x + player.rect.width // 2,
+                                    player.rect.y + camera_y + player.rect.height // 2),
+                                   max(player.rect.width, player.rect.height), 3)
+
+        # Statusanzeige unten links (leicht nach oben versetzt)
+        speed_value = int(5 * player.speed_multiplier)  # Basisgeschwindigkeit 5, multipliziert
+        jump_value = 20 if player.can_doublejump else 10
+        multiplier_value = "x2" if GameVariables.HAS_MULTIPLIER else "x1"
+        extra_life_value = "AKTIV" if GameVariables.HAS_EXTRA_LIFE else "INAKTIV"
+
+        status_lines = [
+            f"Speed: {speed_value}",
+            f"Sprungkraft: {jump_value}",
+            f"Multiplikator: {multiplier_value}",
+            f"Extra-Leben: {extra_life_value}"
+        ]
+
+        # Position: unten links, aber ca. 100 Pixel über dem unteren Rand
+        y_offset = GameVariables.SCREEN_HEIGHT - 100
+        for line in status_lines:
+            txt = GameVariables.FONT_SMALL.render(line, True, "white")
+            screen.blit(txt, (40, y_offset))  # 40 Pixel vom linken Rand
+            y_offset += 20
 
         pygame.display.flip()
         clock.tick(GameVariables.FPS)
@@ -477,7 +572,6 @@ def name_input_screen(screen, clock):
 
 def highscore_screen(screen, clock):
     pygame.display.set_caption("Highscores")
-
     scores = load_scores()
     sorted_scores = sorted(scores.items(), key=lambda x: x[1], reverse=True)
     x_text = GameVariables.FONT_BIG.render("X", True, "white")
@@ -511,24 +605,24 @@ def highscore_screen(screen, clock):
         if not scores:
             screen.blit(source=keine_spieler_text, dest=keine_spieler_text_rect)
         y = 150
-        for idx, (name, score) in enumerate(sorted_scores):
+        for idx, (name, entry) in enumerate(sorted_scores):
+            # Falls alter Eintrag nur Zahl ist
+            score_value = entry if isinstance(entry, int) else entry.get("score", 0)
+
             if idx == 0:
-                text = GameVariables.FONT_MIDDLE.render(f"1. {name} - {score}s", True, "gold")
+                text = GameVariables.FONT_MIDDLE.render(f"1. {name} - {score_value}s", True, "gold")
                 screen.blit(text, (100, y))
                 y += 75
-
-            if idx == 1:
-                text = GameVariables.FONT_MIDDLE.render(f"2. {name} - {score}s", True, "silver")
+            elif idx == 1:
+                text = GameVariables.FONT_MIDDLE.render(f"2. {name} - {score_value}s", True, "silver")
                 screen.blit(text, (100, y))
                 y += 75
-
-            if idx == 2:
-                text = GameVariables.FONT_MIDDLE.render(f"3. {name} - {score}s", True, "brown")
+            elif idx == 2:
+                text = GameVariables.FONT_MIDDLE.render(f"3. {name} - {score_value}s", True, "brown")
                 screen.blit(text, (100, y))
                 y += 75
-
-            if idx >= 3:
-                text = GameVariables.FONT_MIDDLE.render(f"4. {name} - {score}s", True, "white")
+            else:
+                text = GameVariables.FONT_MIDDLE.render(f"{idx + 1}. {name} - {score_value}s", True, "white")
                 screen.blit(text, (100, y))
                 y += 75
 
@@ -694,6 +788,24 @@ def respawn_player(player, ground, spikes, camera_setter=None, clear_radius=2, s
 
 def shop_screen(screen, clock):
     pygame.display.set_caption("Shop")
+    scores = load_scores()
+    # Prüfen ob Spieler existiert
+    if GameVariables.PLAYER_NAME not in scores:
+        # Spieler hat noch nie gespielt → zurück zum Main-Screen
+        return GameScreens.MAIN
+
+    # Spieler existiert → Daten laden
+    entry = scores[GameVariables.PLAYER_NAME]
+    if isinstance(entry, int):
+        GameVariables.SCORE = entry
+    else:
+        GameVariables.SCORE = entry.get("score", 0)
+        upgrades = entry.get("upgrades", {})
+        GameVariables.HAS_SHIELD = upgrades.get("HAS_SHIELD", False)
+        GameVariables.HAS_SPEED = upgrades.get("HAS_SPEED", False)
+        GameVariables.HAS_DOUBLEJUMP = upgrades.get("HAS_DOUBLEJUMP", False)
+        GameVariables.HAS_MULTIPLIER = upgrades.get("HAS_MULTIPLIER", False)
+        GameVariables.HAS_EXTRA_LIFE = upgrades.get("HAS_EXTRA_LIFE", False)
 
     titel_text = GameVariables.FONT_BIG.render("Shop & Upgrades", True, "white")
     titel_rect = titel_text.get_rect(center=(GameVariables.SCREEN_WIDTH / 2, 100))
@@ -736,6 +848,9 @@ def shop_screen(screen, clock):
                         elif GameVariables.SCORE >= preis:
                             GameVariables.SCORE -= preis
                             setattr(GameVariables, flag, True)
+                            scores = load_scores()
+                            if GameVariables.PLAYER_NAME in scores:
+                                update_score(GameVariables.PLAYER_NAME, GameVariables.SCORE, force_save=True)
                             feedback_text = f"{name} gekauft!"
                             feedback_color = (0, 200, 0)
                             feedback_timer = pygame.time.get_ticks()
@@ -743,6 +858,7 @@ def shop_screen(screen, clock):
                             feedback_text = "Nicht genug Punkte!"
                             feedback_color = (200, 0, 0)
                             feedback_timer = pygame.time.get_ticks()
+
 
         screen.fill("black")
         screen.blit(titel_text, titel_rect)
@@ -758,7 +874,7 @@ def shop_screen(screen, clock):
                 text = GameVariables.FONT_MIDDLE.render(f"{name} - gekauft", True, "white")
             else:
                 pygame.draw.rect(screen, (0, 255, 0), rect, border_radius=10)
-                text = GameVariables.FONT_MIDDLE.render(f"{name} - {preis} Punkte", True, "black")
+                text = pygame.font.SysFont("bahnschrift", 24, bold=True).render(f"{name} - {preis} Punkte", True, "black")
             text_rect = text.get_rect(center=rect.center)
             screen.blit(text, text_rect)
 
@@ -766,6 +882,96 @@ def shop_screen(screen, clock):
             fb = GameVariables.FONT_MIDDLE.render(feedback_text, True, feedback_color)
             fb_rect = fb.get_rect(center=(GameVariables.SCREEN_WIDTH / 2, GameVariables.SCREEN_HEIGHT - 100))
             screen.blit(fb, fb_rect)
+
+        pygame.display.flip()
+        clock.tick(GameVariables.FPS)
+
+def admin_panel_screen(screen, clock):
+    pygame.display.set_caption("Admin-Panel")
+    running = True
+    input_name = ""
+    input_score = ""
+    scores = load_scores()
+    focus = 0  # 0 = Spieler, 1 = Score
+
+    # Feedback
+    feedback_text = ""
+    feedback_color = None
+    feedback_until = 0
+
+    while running:
+        now = pygame.time.get_ticks()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit(); exit(0)
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    return GameScreens.EXIT
+                elif event.key == pygame.K_TAB:
+                    focus = 1 - focus
+                elif event.key == pygame.K_BACKSPACE:
+                    if focus == 1 and input_score:
+                        input_score = input_score[:-1]
+                    elif focus == 0 and input_name:
+                        input_name = input_name[:-1]
+                elif event.key == pygame.K_RETURN:
+                    try:
+                        if input_name in scores:
+                            new_score = int(input_score)
+                            scores[input_name]["score"] = new_score
+                            save_scores(scores)
+                            feedback_text = "Gespeichert"
+                            feedback_color = (0, 200, 0)  # grün
+                            feedback_until = now + 2000
+                        else:
+                            feedback_text = f"Fehler: Spieler '{input_name}' nicht gefunden"
+                            feedback_color = (200, 0, 0)  # rot
+                            feedback_until = now + 4000
+                    except ValueError:
+                        feedback_text = "Fehler: Score muss Zahl sein"
+                        feedback_color = (200, 0, 0)
+                        feedback_until = now + 4000
+                else:
+                    if focus == 1 and event.unicode.isdigit():
+                        input_score += event.unicode
+                    elif focus == 0:
+                        input_name += event.unicode
+
+        # Hintergrund
+        screen.fill("yellow")
+        title = GameVariables.FONT_BIG.render("Admin-Panel", True, "black")
+        screen.blit(title, (GameVariables.SCREEN_WIDTH//2 - 150, 50))
+
+        # Textfelder mit Rand
+        name_rect = pygame.Rect(100, 200, 400, 40)
+        score_rect = pygame.Rect(100, 260, 400, 40)
+        pygame.draw.rect(screen, (0,0,0), name_rect, 2 if focus == 0 else 1)
+        pygame.draw.rect(screen, (0,0,0), score_rect, 2 if focus == 1 else 1)
+
+        # Texte
+        name_txt = GameVariables.FONT_MIDDLE.render("Spieler: " + input_name, True, "black")
+        score_txt = GameVariables.FONT_MIDDLE.render("Neuer Score: " + input_score, True, "black")
+        screen.blit(name_txt, (name_rect.x+5, name_rect.y+5))
+        screen.blit(score_txt, (score_rect.x+5, score_rect.y+5))
+
+        # Caret (blinkender Strich)
+        caret_height = GameVariables.FONT_MIDDLE.get_height()
+        if focus == 0:
+            caret_x = name_rect.x + 5 + GameVariables.FONT_MIDDLE.size("Spieler: " + input_name)[0]
+            caret_y = name_rect.y + 5
+        else:
+            caret_x = score_rect.x + 5 + GameVariables.FONT_MIDDLE.size("Neuer Score: " + input_score)[0]
+            caret_y = score_rect.y + 5
+        if (now // 500) % 2 == 0:
+            pygame.draw.line(screen, (0,0,0), (caret_x, caret_y), (caret_x, caret_y+caret_height), 2)
+
+        # Feedback anzeigen
+        if feedback_text and now < feedback_until:
+            fb_txt = GameVariables.FONT_MIDDLE.render(feedback_text, True, feedback_color)
+            screen.blit(fb_txt, (100, 350))
+
+        info_txt = GameVariables.FONT_SMALL.render("TAB = wechseln, Enter = speichern, ESC = schließen", True, "black")
+        screen.blit(info_txt, (100, 400))
 
         pygame.display.flip()
         clock.tick(GameVariables.FPS)
@@ -794,14 +1000,34 @@ def main():
             GameScreens.actual = death_screen(screen, clock)
         elif GameScreens.actual == GameScreens.CREDITS:
             GameScreens.actual = credits_screen(screen, clock)
+        elif GameScreens.actual == GameScreens.ADMIN_PANEL:
+            GameScreens.actual = admin_panel_screen(screen, clock)
         elif GameScreens.actual == GameScreens.NAME_INPUT_SHOP:
             result = name_input_screen(screen, clock)
             if result == GameScreens.PLAY:
                 scores = load_scores()
                 if GameVariables.PLAYER_NAME in scores:
-                    GameVariables.SCORE = scores[GameVariables.PLAYER_NAME]
+                    entry = scores[GameVariables.PLAYER_NAME]
+                    if isinstance(entry, int):
+                        GameVariables.SCORE = entry
+                    else:
+                        GameVariables.SCORE = entry.get("score", 0)
+                        upgrades = entry.get("upgrades", {})
+                        GameVariables.HAS_SHIELD = upgrades.get("HAS_SHIELD", False)
+                        GameVariables.HAS_SPEED = upgrades.get("HAS_SPEED", False)
+                        GameVariables.HAS_DOUBLEJUMP = upgrades.get("HAS_DOUBLEJUMP", False)
+                        GameVariables.HAS_MULTIPLIER = upgrades.get("HAS_MULTIPLIER", False)
+                        GameVariables.HAS_EXTRA_LIFE = upgrades.get("HAS_EXTRA_LIFE", False)
                 else:
+                    # Spieler nicht in der Liste → Shop mit 0 Score öffnen
                     GameVariables.SCORE = 0
+                    GameVariables.HAS_SHIELD = False
+                    GameVariables.HAS_SPEED = False
+                    GameVariables.HAS_DOUBLEJUMP = False
+                    GameVariables.HAS_MULTIPLIER = False
+                    GameVariables.HAS_EXTRA_LIFE = False
+                    # WICHTIG: NICHT speichern → kein Eintrag in JSON
+
                 GameScreens.actual = shop_screen(screen, clock)
             else:
                 GameScreens.actual = result

@@ -4,8 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ad0fc84f-e4dd-45ea-b1f9-0ac010cc5c26" name="Changes" comment="Shop &amp; Upgrades hinzugefügt!&#10;&#10;Vincent Raven Schwindsackl - 23.06.2026 12:46:30 Uhr">
+    <list default="true" id="ad0fc84f-e4dd-45ea-b1f9-0ac010cc5c26" name="Changes" comment="Shop &amp; Upgrades hinzugefügt!&#10;1. Score verknüpft mit Shop, sonst erstmal nix.&#10;&#10;Vincent Raven Schwindsackl - 23.06.2026 12:57:55 Uhr">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Game/highscore_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/Game/highscore_manager.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Game/player.py" beforeDir="false" afterPath="$PROJECT_DIR$/Game/player.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/game_variables/game_variables.py" beforeDir="false" afterPath="$PROJECT_DIR$/game_variables/game_variables.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
@@ -326,7 +328,15 @@
       <option name="project" value="LOCAL" />
       <updated>1782211584550</updated>
     </task>
-    <option name="localTasksCounter" value="29" />
+    <task id="LOCAL-00029" summary="Shop &amp; Upgrades hinzugefügt!&#10;1. Score verknüpft mit Shop, sonst erstmal nix.&#10;&#10;Vincent Raven Schwindsackl - 23.06.2026 12:57:55 Uhr">
+      <option name="closed" value="true" />
+      <created>1782212278573</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1782212278573</updated>
+    </task>
+    <option name="localTasksCounter" value="30" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -353,7 +363,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added comments" />
     <MESSAGE value="changed the font from &quot;bahnschrift&quot; to &quot;orbitron&quot;" />
     <MESSAGE value="Controls-Fenster hinzugefügt. ein X-Knopf beim Controls-Fenster hinzugefügt. Wenn man den X-Knopf anklickt, landet man wieder im Hauptmenü!" />
     <MESSAGE value="gitignore für fehlerbehebung" />
@@ -378,6 +387,7 @@
     <MESSAGE value="Sprungkraft von 15 auf 20 erhöht!&#10;&#10;&#10;&#10;Vincent Raven Schwindsackl - 23.06.2026 10:30:50 Uhr" />
     <MESSAGE value="Leichte Fixes!&#10;&#10;Vincent Raven Schwindsackl - 23.06.2026 11:04:30 Uhr" />
     <MESSAGE value="Shop &amp; Upgrades hinzugefügt!&#10;&#10;Vincent Raven Schwindsackl - 23.06.2026 12:46:30 Uhr" />
-    <option name="LAST_COMMIT_MESSAGE" value="Shop &amp; Upgrades hinzugefügt!&#10;&#10;Vincent Raven Schwindsackl - 23.06.2026 12:46:30 Uhr" />
+    <MESSAGE value="Shop &amp; Upgrades hinzugefügt!&#10;1. Score verknüpft mit Shop, sonst erstmal nix.&#10;&#10;Vincent Raven Schwindsackl - 23.06.2026 12:57:55 Uhr" />
+    <option name="LAST_COMMIT_MESSAGE" value="Shop &amp; Upgrades hinzugefügt!&#10;1. Score verknüpft mit Shop, sonst erstmal nix.&#10;&#10;Vincent Raven Schwindsackl - 23.06.2026 12:57:55 Uhr" />
   </component>
 </project>
